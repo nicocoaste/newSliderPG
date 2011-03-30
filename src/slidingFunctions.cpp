@@ -1,4 +1,7 @@
+//  Copyright AIST-CNRS Joint Robotics Laboratory
+//  Author: Nicolas Perrin
 
+#include "newSliderPG/slidingFunctions.h"
 
 void CnewPGstepStudy::addStepFeaturesWithSlide(
 	StepFeatures & stepF1,

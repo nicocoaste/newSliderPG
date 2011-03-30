@@ -1,4 +1,7 @@
+//  Copyright AIST-CNRS Joint Robotics Laboratory
+//  Author: Nicolas Perrin
 
+#include "newSliderPG/halfStep_creation.h"
 
 double w (double t, double g, double zc, double delta0, double deltaX, double t1, double t2, double V, double W)
 {
@@ -211,9 +214,7 @@ double searchVinit (double g, double zc, double delta0, double deltaX, double de
 
 }
 
-
-
-void CnewPGstepStudy::genCOMZMPtrajectory(vector<double> & outputCOM, vector<double> & outputZMP, double incrTime, double zc, double g, double delta0, double deltaX, double deltaX2, double t1, double t2, double t3, double t4, double t5)
+void genCOMZMPtrajectory(vector<double> & outputCOM, vector<double> & outputZMP, double incrTime, double zc, double g, double delta0, double deltaX, double deltaX2, double t1, double t2, double t3, double t4, double t5)
 {
 
 	double sensitivityLimit = 0.00001; //because of the instability of the formula.
@@ -268,8 +269,7 @@ void CnewPGstepStudy::genCOMZMPtrajectory(vector<double> & outputCOM, vector<dou
 
 }
 
-
-void CnewPGstepStudy::genFOOTposition(vector<double> & outputX, vector<double> & outputY, double incrTime, double xinit, double yinit, double xend, double yend, double delay, double t1, double t2, double t3, double t4, double t5, char du)
+void genFOOTposition(vector<double> & outputX, vector<double> & outputY, double incrTime, double xinit, double yinit, double xend, double yend, double delay, double t1, double t2, double t3, double t4, double t5, char du)
 {
 
 	if(du == '2') {
@@ -376,7 +376,7 @@ void CnewPGstepStudy::genFOOTposition(vector<double> & outputX, vector<double> &
 
 }
 
-void CnewPGstepStudy::genFOOTheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3, double t4, double t5)
+void genFOOTheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3, double t4, double t5)
 {
 
 	output.clear();
@@ -407,7 +407,7 @@ void CnewPGstepStudy::genFOOTheight(vector<double> & output, double incrTime, do
 
 }
 
-void CnewPGstepStudy::genFOOTdownUPheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3)
+void genFOOTdownUPheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3)
 {
 
 	output.clear();
@@ -438,7 +438,7 @@ void CnewPGstepStudy::genFOOTdownUPheight(vector<double> & output, double incrTi
 
 }
 
-void CnewPGstepStudy::genFOOTupDOWNheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3)
+void genFOOTupDOWNheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3)
 {
 
 	output.clear();
@@ -464,7 +464,7 @@ void CnewPGstepStudy::genFOOTupDOWNheight(vector<double> & output, double incrTi
 
 }
 
-void CnewPGstepStudy::genFOOTorientation(vector<double> & output, double incrTime, double initOrient, double endOrient, double delay, double t1, double t2, double t3, double t4, double t5, char du)
+void genFOOTorientation(vector<double> & output, double incrTime, double initOrient, double endOrient, double delay, double t1, double t2, double t3, double t4, double t5, char du)
 {
 
 	if(du == '2') {
@@ -559,8 +559,7 @@ void CnewPGstepStudy::genFOOTorientation(vector<double> & output, double incrTim
 
 }
 
-
-void CnewPGstepStudy::genWAISTorientation(vector<double> & output, double incrTime, double initOrient, double endOrient, double delay, double t1, double t2, double t3, double t4, double t5, char du)
+void genWAISTorientation(vector<double> & output, double incrTime, double initOrient, double endOrient, double delay, double t1, double t2, double t3, double t4, double t5, char du)
 {
 
 	if(du == '2') {
@@ -654,7 +653,9 @@ void CnewPGstepStudy::genWAISTorientation(vector<double> & output, double incrTi
 
 }
 
-void CnewPGstepStudy::produceOneUPHalfStepFeatures(StepFeatures & stepF, double incrTime, double zc, double g, double t1, double t2, double t3, vector<double> vectUPHalfStep_input, char leftOrRightFootStable)
+//TODO: to save computation time, even though the different trajectories are generated separetely,
+//we should generate them directly in the good vecotr of instantFeatures.
+void produceOneUPHalfStepFeatures(const StepFeatures & stepF, double incrTime, double zc, double g, double t1, double t2, double t3, vector<double> vectUPHalfStep_input, char leftOrRightFootStable)
 {
 
 	vector<double> comTrajX;
@@ -729,8 +730,7 @@ void CnewPGstepStudy::produceOneUPHalfStepFeatures(StepFeatures & stepF, double 
 
 }
 
-
-void CnewPGstepStudy::produceOneDOWNHalfStepFeatures(StepFeatures & stepF, double incrTime, double zc, double g, double t1, double t2, double t3, vector<double> vectDOWNHalfStep_input, char leftOrRightFootStable)
+void produceOneDOWNHalfStepFeatures(const StepFeatures & stepF, double incrTime, double zc, double g, double t1, double t2, double t3, vector<double> vectDOWNHalfStep_input, char leftOrRightFootStable)
 {
 
 	vector<double> comTrajX;
@@ -799,4 +799,22 @@ void CnewPGstepStudy::produceOneDOWNHalfStepFeatures(StepFeatures & stepF, doubl
 	stepF.zc = zc;
 	stepF.size = waistOrient.size();
 
+}
+
+void generate_halfStepFeatures(trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

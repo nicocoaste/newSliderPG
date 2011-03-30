@@ -145,6 +145,6 @@ struct halfStepDefinition {
  * frame, and a halfStepDefinition, and generates the trajFeatures
  * corresponding to the half-step defined. 
  */
-void generate_halfStepFeatures(trajFeatures & t, const SE2 & supportconfig, const inithalfStepDefinition & def);
+void generate_halfStepFeatures(trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def);
 
 #endif
