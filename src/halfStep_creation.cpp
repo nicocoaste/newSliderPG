@@ -6,6 +6,109 @@
 
 #include "newSliderPG/halfStep_creation.h"
 
+
+float A( float x ) {    
+    return x*x*(2-x)*(2-x);               
+}
+
+float B( float r, float x ) {    
+    return (1+r)*x-r*x*x;                
+}
+
+//This function y obtained with wxmaxima is the main solution of the differential equation that gives the com in function of the zmp
+// K = z_com / g
+// val = the value aimed at (this is the value towards which the ZMP goes) (in m.)
+// T = the total time after which the function should be equal to val, like the ZMP. (in s.)
+// r = a parameter of the ZMP curve. The standard value is 1.015179, but better results
+//     can be obtained for larger values of r.
+// position = the start point of the com, i.e. the y function (but the zmp starts at zero.
+// speed = the initial speed of the com
+// x is actually the time, so the main variable.
+// 	There are 2 way to use y:
+// 	(CASE 1:) without change: it corresponds to starting at 'position' and aiming at 'val', 
+// 	          going to 'val' as fast as possible
+// 	(CASE 2:) using    val - y(K,r,val,T,position,speed,T-x):
+// 	          it corresponds to starting at 'val' and aiming at 'position', staying
+// 	          near position as long as possible.
+// 	In the 2 cases, different zmp curves are obtained:
+// 	(CASE 1): val*A(B(r,x/T))
+// 	(CASE 2): val - val*A(B(r,T-x/T)) 
+double y( float K, float r, float val, float T, float position, double speed, float x) {
+    
+    float x2 = x*x;
+    float x3 = x2 * x;
+    float x4 = x3 * x;
+    float x5 = x4 * x;
+    float x6 = x5 * x;
+    float x7 = x6 * x;
+    float x8 = x7 * x;
+  
+    float T2 = T*T;
+    float T3 = T2 * T;
+    float T4 = T3 * T;
+    float T5 = T4 * T;
+    float T6 = T5 * T;
+    float T7 = T6 * T;
+    float T8 = T7 * T;
+
+    float r2 = r*r;
+    float r3 = r2 * r;
+    float r4 = r3 * r;
+    
+    float K2 = K*K;
+    float K3 = K2 * K;
+    float K4 = K3 * K;
+        
+    double result = (exp(x/sqrt(K))*((speed*sqrt(K)+position)*T8+(-8*r2-16*r-8)*val*K*T6+val*(24*r3*sqrt(K)+120*r2*sqrt(K)+120*r*sqrt(K)+24*sqrt(K))*K*T5+
+(-24*r4-384*r3-816*r2-384*r-24)*val*K2*T4+val*(480*r4*sqrt(K)+2880*r3*sqrt(K)+2880*r2*sqrt(K)+480*r*sqrt(K))*K2*T3+(-4320*r4-11520*r3-4320*r2)*
+val*K3*T2+val*(20160*r4*sqrt(K)+20160*r3*sqrt(K))*K3*T-40320*r4*val*K4))/(2*T8)+(exp(-x/sqrt(K))*((position-speed*sqrt(K))*T8+(-8*r2-16*r-8)*val*K*T6
++val*(-24*r3*sqrt(K)-120*r2*sqrt(K)-120*r*sqrt(K)-24*sqrt(K))*K*T5+(-24*r4-384*r3-816*r2-384*r-24)*val*K2*T4+val*
+(-480*r4*sqrt(K)-2880*r3*sqrt(K)-2880*r2*sqrt(K)-480*r*sqrt(K))*K2*T3+(-4320*r4-11520*r3-4320*r2)*val*K3*T2+val*(-20160*r4*sqrt(K)-20160*r3*sqrt(K))*K3*T-
+40320*r4*val*K4))/(2*T8)+(((8*r2+16*r+8)*val*K+(4*r2+8*r+4)*val*x2)*T6+
+((-24*r3-120*r2-120*r-24)*val*x*K+(-4*r3-20*r2-20*r-4)*val*x3)*T5+
+((24*r4+384*r3+816*r2+384*r+24)*val*K2+(12*r4+192*r3+408*r2+192*r+12)*val*x2*K+(r4+16*r3+34*r2+16*r+1)*val*x4)*T4+
+((-480*r4-2880*r3-2880*r2-480*r)*val*x*K2+(-80*r4-480*r3-480*r2-80*r)*val*x3*K+(-4*r4-24*r3-24*r2-4*r)*val*x5)*T3+
+((4320*r4+11520*r3+4320*r2)*val*K3+(2160*r4+5760*r3+2160*r2)*val*x2*K2+(180*r4+480*r3+180*r2)*val*x4*K+(6*r4+16*r3+6*r2)*val*x6)
+*T2+((-20160*r4-20160*r3)*val*x*K3+(-3360*r4-3360*r3)*val*x3*K2+(-168*r4-168*r3)*val*x5*K+(-4*r4-4*r3)*val*x7)*T+40320*r4*val*K4+
+20160*r4*val*x2*K3+1680*r4*val*x4*K2+56*r4*val*x6*K+r4*val*x8)/(T8);
+
+    return result;
+
+};
+
+//This function y_adjust is used to adjust the speed parameter in the function y
+double y_adjust(float K, float r, float val, float T, float position, float x) {
+    
+    double MIN_SPEED, MAX_SPEED;
+    if( val > position ) {
+	MAX_SPEED = 1.0; //it is inconceivable to start at more than 1m/s
+	MIN_SPEED = 0.0;
+    }
+    else {
+	MAX_SPEED = 0.0;
+	MIN_SPEED = -1.0;
+    }
+    
+    double CURRENT_SPEED = (MAX_SPEED + MIN_SPEED) / 2.0;
+    double result = y(K, r, val, T, position, CURRENT_SPEED, T);
+    
+    while( abs(result - val) > 0.001 ) {
+	if(result > val) {
+	    MAX_SPEED = CURRENT_SPEED;
+	    CURRENT_SPEED = (MAX_SPEED + MIN_SPEED) / 2.0;
+	    result = y(K, r, val, T, position, CURRENT_SPEED, T);
+	} else {
+	    MIN_SPEED = CURRENT_SPEED;
+	    CURRENT_SPEED = (MAX_SPEED + MIN_SPEED) / 2.0;
+	    result = y(K, r, val, T, position, CURRENT_SPEED, T);
+	}
+    }
+    
+    return CURRENT_SPEED;   
+}
+
+
+
 float w (float t, float g, float zc, float delta0, float deltaX, float t1, float t2, float V, float W)
 {
 
