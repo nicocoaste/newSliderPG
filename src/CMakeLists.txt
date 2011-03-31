@@ -15,7 +15,9 @@
 SET(libdyn_src
 # ex : toto.cpp 
 # ...    
-  newPGstepStudy.cpp	
+  newSliderPG.cpp
+  slidingFunctions.cpp
+  halfStep_creation.cpp
  )
 
 
@@ -24,7 +26,9 @@ SET(libdyn_src
 SET(libdyn_headers 
 # ex : ../include/${PROJECT_NAME}/toto.h
 # ...  
-  ../include/${PROJECT_NAME}/newPGstepStudy.h
+  ../include/${PROJECT_NAME}/newSliderPG.h
+  ../include/${PROJECT_NAME}/slidingFunctions.h
+  ../include/${PROJECT_NAME}/halfStep_creation.h
 )
 
 FOREACH(srcfile ${libdyn_src})

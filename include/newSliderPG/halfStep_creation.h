@@ -57,7 +57,7 @@ struct hsConstants {
 struct feetDimensions {
 	float width;
 	float length;
-}
+};
 
 /*!
  *  This structure contains the same data as trajFeatures, but taken at 
@@ -72,12 +72,12 @@ struct instantFeatures {
 	float leftfootX;
 	float leftfootY;
 	float leftfootHeight;
-	float leftfootOrient;
+	float leftfootOrient; //in degrees
 	float rightfootX;
 	float rightfootY;
 	float rightfootHeight;
-	float rightfootOrient;
-	float waistOrient;
+	float rightfootOrient; //in degrees
+	float waistOrient; //in degrees
 };
 
 /*!
@@ -124,7 +124,7 @@ struct viaPointConfig {
 
 /*!
  * This structure contains the low dimension definition of a half-step.
- * Only three continuous parameters are needed: x, y, and theta,
+ * Only three continuous parameters are needed: x, y, and theta (in pos_and_orient),
  * which define the relative position and orientation of the swing
  * foot when on the ground.
  * The via-point configuration should be fixed.

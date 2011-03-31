@@ -31,9 +31,9 @@ using namespace std;
  * description by an instantFeatures object. 
  * Must be implemented by the user.
  */
-virtual class CheckValidity {
+class CheckValidity {
     public:
-	bool isValid(instantFeatures & i) { return true; }
+	virtual bool isValid(instantFeatures & i) { return true; }
 };
 
 class slidingClass {
@@ -41,7 +41,7 @@ class slidingClass {
 	/*!
 	 * Constructor.
 	 */
-	slidingClass();
+	slidingClass(float updo_max = 0.0, float doup_max = 0.0);
 	/*!
 	 * Destructor.
 	*/
@@ -54,12 +54,12 @@ class slidingClass {
 	* The last config of the first trajFeatures MUST be the same as the first config
 	* of the second trajFeatures.
 	*/
-	void slideUpDownMAX(trajFeatures & t, const trajFeatures & downward_halfstep);
+	void slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep);
 	
 	/*!
 	 * Similar to slideUpDownMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
 	 */
-	void slideUpDownCOEF(trajFeatures & t, float neg_time, const trajFeatures & downward_halfstep);
+	void slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeatures & downward_halfstep);
 
 
 	/*!
@@ -69,12 +69,12 @@ class slidingClass {
 	* The last config of the first trajFeatures MUST be the same as the first config
 	* of the second trajFeatures.
 	*/
-	void slideDownUpMAX(trajFeatures & t, const trajFeatures & upward_halfstep);
+	void slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep);
 	
 	/*!
 	 * Similar to slideDownUpMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
 	 */
-	void slideDownUpCOEF(trajFeatures & t, float neg_time, const trajFeatures & downward_halfstep);
+	void slideDownUpCOEF(trajFeatures & t, float neg_time, trajFeatures & downward_halfstep);
 	
     private:
 	/*!

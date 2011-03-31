@@ -21,7 +21,6 @@
 
 #include "newSliderPG/halfStep_creation.h"
 #include "newSliderPG/slidingFunctions.h"
-#include "newSliderPG/plotFunctions.h"
 
 #ifndef PI
 # define PI 3.14159265359
@@ -43,12 +42,12 @@ class CnewSliderPG
 		 * Destructor.
 		 */
 		~CnewSliderPG();
-				
-		void set_incrTime(float itime) {incrTime = itime};
-		void set_first_support_foot(LoR fsf) {first_support_foot = fsf};
-		void set_vp_config(const viaPointConfig & vpc) {vp_config = vpc};
-		void set_ft_dim(const feetDimensions & ftd) {ft_dim = ftd};
-		void set_constants(const hsConstants & csts) {constants = csts};
+		
+		void set_incrTime(float itime) {incrTime = itime;}
+		void set_first_support_foot(LoR fsf) {first_support_foot = fsf;}
+		void set_vp_config(const viaPointConfig & vpc) {vp_config = vpc;}
+		void set_ft_dim(const feetDimensions & ftd) {ft_dim = ftd;}
+		void set_constants(const hsConstants & csts) {constants = csts;}
 		
 		/*!
 		 * produceTraj generates the trajectories of the end-effectors of
@@ -134,7 +133,7 @@ class CnewSliderPG
 		 * plot "data.gnuplot" index 0 w l lt 1 lw 0.5 lc 1, 
 		 * "data.gnuplot" index 1 w l lt 2 lw 0.5 lc 2, "data.gnuplot"
 		 *  index 2 w l lt 2 lw 0.5 lc 2, "data.gnuplot" index 3 w l
-		 * lt 1 lw 0.5 lc 3, "totoOutput.dat" index 4 w l lt 1 lw 0.5 lc 4
+		 * lt 1 lw 0.5 lc 3, "data.gnuplot" index 4 w l lt 1 lw 0.5 lc 4
 		 * Then, gnuplot> load 'toto.txt' will produce the eps file
 		 * "totoOutput.eps".
 		 * @param fb The ofstream corresponding to the file where the data

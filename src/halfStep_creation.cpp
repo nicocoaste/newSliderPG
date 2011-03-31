@@ -1,9 +1,12 @@
 //  Copyright AIST-CNRS Joint Robotics Laboratory
 //  Author: Nicolas Perrin
 
+#define DELAY_1 0.005
+#define DELAY_2 0.2
+
 #include "newSliderPG/halfStep_creation.h"
 
-double w (double t, double g, double zc, double delta0, double deltaX, double t1, double t2, double V, double W)
+float w (float t, float g, float zc, float delta0, float deltaX, float t1, float t2, float V, float W)
 {
 
 	return(delta0+(V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc/pow(t2-t1,2.0)/g)*cosh(sqrt(g/zc)*(t-t1))+(V*sinh(sqrt(g/zc)*t1)*sqrt(g/zc
@@ -14,7 +17,7 @@ double w (double t, double g, double zc, double delta0, double deltaX, double t1
 
 };
 
-double w2 (double t, double g, double zc, double deltaX2, double t2, double t3, double t4, double K2, double V2, double W2)
+float w2 (float t, float g, float zc, float deltaX2, float t2, float t3, float t4, float K2, float V2, float W2)
 {
 
 	return(K2+(V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*
@@ -26,21 +29,21 @@ double w2 (double t, double g, double zc, double deltaX2, double t2, double t3, 
 
 };
 
-double u (double t, double g, double zc, double t2, double K2, double V2, double W2)
+float u (float t, float g, float zc, float t2, float K2, float V2, float W2)
 {
 
 	return(V2*cosh(sqrt(g/zc)*(t-t2))+W2*sinh(sqrt(g/zc)*(t-t2))+K2);
 
 };
 
-double u2 (double t, double g, double zc, double t4, double K3, double V3, double W3)
+float u2 (float t, float g, float zc, float t4, float K3, float V3, float W3)
 {
 
 	return(V3*cosh(sqrt(g/zc)*(t-t4))+W3*sinh(sqrt(g/zc)*(t-t4))+K3);
 
 };
 
-double hZMP (double t, double g, double zc, double delta0, double deltaX, double deltaX2, double t1, double t2, double t3, double t4, double V, double W, double K2, double V2, double W2, double K3, double V3, double W3)
+float hZMP (float t, float g, float zc, float delta0, float deltaX, float deltaX2, float t1, float t2, float t3, float t4, float V, float W, float K2, float V2, float W2, float K3, float V3, float W3)
 {
 
 	if(t <= t1)
@@ -70,7 +73,7 @@ double hZMP (double t, double g, double zc, double delta0, double deltaX, double
 
 };
 
-double h (double t, double g, double zc, double delta0, double deltaX, double deltaX2, double t1, double t2, double t3, double t4, double V, double W, double K2, double V2, double W2, double K3, double V3, double W3)
+float h (float t, float g, float zc, float delta0, float deltaX, float deltaX2, float t1, float t2, float t3, float t4, float V, float W, float K2, float V2, float W2, float K3, float V3, float W3)
 {
 
 	if(t <= t1)
@@ -96,13 +99,13 @@ double h (double t, double g, double zc, double delta0, double deltaX, double de
 
 };
 
-vector<double> hVinit (double t, double g, double zc, double delta0, double deltaX, double deltaX2, double t1, double t2, double t3, double t4, double t5, double pinit, double vinit)
+vector<float> hVinit (float t, float g, float zc, float delta0, float deltaX, float deltaX2, float t1, float t2, float t3, float t4, float t5, float pinit, float vinit)
 {
 
-	vector<double> PairToReturn;
-	double V = pinit-delta0;
-	double W = vinit/sqrt(g/zc);
-	double K2 = delta0+(V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0
+	vector<float> PairToReturn;
+	float V = pinit-delta0;
+	float W = vinit/sqrt(g/zc);
+	float K2 = delta0+(V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0
 		*deltaX*zc/pow(t2-t1,2.0)/g)*cosh(sqrt(g/zc)*(t2-t1))+(V*sinh(sqrt(g/zc)*t1
 		)*sqrt(g/zc)+W*cosh(sqrt(g/zc)*t1)*sqrt(g/zc)+12.0*deltaX*zc/pow(t2-t1,3.0)
 		/g)*sinh(sqrt(g/zc)*(t2-t1))/sqrt(g/zc)+deltaX-6.0*deltaX*zc/pow(t2-t1,2.0)/g-zc/g*((V*
@@ -110,15 +113,15 @@ vector<double> hVinit (double t, double g, double zc, double delta0, double delt
 		cosh(sqrt(g/zc)*(t2-t1))*g/zc+(V*sinh(sqrt(g/zc)*t1)*sqrt(g/zc)+W*cosh(sqrt(g/
 		zc)*t1)*sqrt(g/zc)+12.0*deltaX*zc/pow(t2-t1,3.0)/g)*sinh(sqrt(g/zc)*(t2-t1)
 		)*sqrt(g/zc)-6.0*deltaX/pow(t2-t1,2.0));
-	double V2 = zc/g*((V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc
+	float V2 = zc/g*((V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc
 		/pow(t2-t1,2.0)/g)*cosh(sqrt(g/zc)*(t2-t1))*g/zc+(V*sinh(sqrt(g/zc)*t1)*sqrt(g/
 		zc)+W*cosh(sqrt(g/zc)*t1)*sqrt(g/zc)+12.0*deltaX*zc/pow(t2-t1,3.0)/g)*sinh(
 		sqrt(g/zc)*(t2-t1))*sqrt(g/zc)-6.0*deltaX/pow(t2-t1,2.0));
-	double W2 = ((V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc/pow(
+	float W2 = ((V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc/pow(
 		t2-t1,2.0)/g)*sinh(sqrt(g/zc)*(t2-t1))*sqrt(g/zc)+(V*sinh(sqrt(g/zc)*t1)*sqrt(g
 		/zc)+W*cosh(sqrt(g/zc)*t1)*sqrt(g/zc)+12.0*deltaX*zc/pow(t2-t1,3.0)/g)*cosh
 		(sqrt(g/zc)*(t2-t1))-12.0*deltaX*zc/pow(t2-t1,3.0)/g)/sqrt(g/zc);
-	double K3 = K2+(V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2)
+	float K3 = K2+(V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2)
 		)-6.0*deltaX2*zc/pow(t4-t3,2.0)/g)*cosh(sqrt(g/zc)*(t4-t3))+(V2*sinh(sqrt(g
 		/zc)*(t3-t2))*sqrt(g/zc)+W2*cosh(sqrt(g/zc)*(t3-t2))*sqrt(g/zc)+12.0*deltaX2
 		*zc/pow(t4-t3,3.0)/g)*sinh(sqrt(g/zc)*(t4-t3))/sqrt(g/zc)+deltaX2-6.0*deltaX2*zc/pow(t4-t3,2.0)/g-zc/g*((
@@ -126,12 +129,12 @@ vector<double> hVinit (double t, double g, double zc, double delta0, double delt
 		t4-t3,2.0)/g)*cosh(sqrt(g/zc)*(t4-t3))*g/zc+(V2*sinh(sqrt(g/zc)*(t3-t2))*sqrt(g
 		/zc)+W2*cosh(sqrt(g/zc)*(t3-t2))*sqrt(g/zc)+12.0*deltaX2*zc/pow(t4-t3,3.0)/
 		g)*sinh(sqrt(g/zc)*(t4-t3))*sqrt(g/zc)-6.0*deltaX2/pow(t4-t3,2.0));
-	double V3 = zc/g*((V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*
+	float V3 = zc/g*((V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*
 		deltaX2*zc/pow(t4-t3,2.0)/g)*cosh(sqrt(g/zc)*(t4-t3))*g/zc+(V2*sinh(sqrt(g/
 		zc)*(t3-t2))*sqrt(g/zc)+W2*cosh(sqrt(g/zc)*(t3-t2))*sqrt(g/zc)+12.0*deltaX2
 		*zc/pow(t4-t3,3.0)/g)*sinh(sqrt(g/zc)*(t4-t3))*sqrt(g/zc)-6.0*deltaX2/pow(
 		t4-t3,2.0));
-	double W3 = ((V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*deltaX2*
+	float W3 = ((V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*deltaX2*
 		zc/pow(t4-t3,2.0)/g)*sinh(sqrt(g/zc)*(t4-t3))*sqrt(g/zc)+(V2*sinh(sqrt(g/
 		zc)*(t3-t2))*sqrt(g/zc)+W2*cosh(sqrt(g/zc)*(t3-t2))*sqrt(g/zc)+12.0*deltaX2
 		*zc/pow(t4-t3,3.0)/g)*cosh(sqrt(g/zc)*(t4-t3))-12.0*deltaX2*zc/pow(t4-t3,
@@ -141,12 +144,12 @@ vector<double> hVinit (double t, double g, double zc, double delta0, double delt
 	return PairToReturn;
 };
 
-double hVinitCOMonly (double t, double g, double zc, double delta0, double deltaX, double deltaX2, double t1, double t2, double t3, double t4, double t5, double pinit, double vinit)
+float hVinitCOMonly (float t, float g, float zc, float delta0, float deltaX, float deltaX2, float t1, float t2, float t3, float t4, float t5, float pinit, float vinit)
 {
 
-	double V = pinit-delta0;
-	double W = vinit/sqrt(g/zc);
-	double K2 = delta0+(V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0
+	float V = pinit-delta0;
+	float W = vinit/sqrt(g/zc);
+	float K2 = delta0+(V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0
 		*deltaX*zc/pow(t2-t1,2.0)/g)*cosh(sqrt(g/zc)*(t2-t1))+(V*sinh(sqrt(g/zc)*t1
 		)*sqrt(g/zc)+W*cosh(sqrt(g/zc)*t1)*sqrt(g/zc)+12.0*deltaX*zc/pow(t2-t1,3.0)
 		/g)*sinh(sqrt(g/zc)*(t2-t1))/sqrt(g/zc)+deltaX-6.0*deltaX*zc/pow(t2-t1,2.0)/g-zc/g*((V*
@@ -154,15 +157,15 @@ double hVinitCOMonly (double t, double g, double zc, double delta0, double delta
 		cosh(sqrt(g/zc)*(t2-t1))*g/zc+(V*sinh(sqrt(g/zc)*t1)*sqrt(g/zc)+W*cosh(sqrt(g/
 		zc)*t1)*sqrt(g/zc)+12.0*deltaX*zc/pow(t2-t1,3.0)/g)*sinh(sqrt(g/zc)*(t2-t1)
 		)*sqrt(g/zc)-6.0*deltaX/pow(t2-t1,2.0));
-	double V2 = zc/g*((V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc
+	float V2 = zc/g*((V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc
 		/pow(t2-t1,2.0)/g)*cosh(sqrt(g/zc)*(t2-t1))*g/zc+(V*sinh(sqrt(g/zc)*t1)*sqrt(g/
 		zc)+W*cosh(sqrt(g/zc)*t1)*sqrt(g/zc)+12.0*deltaX*zc/pow(t2-t1,3.0)/g)*sinh(
 		sqrt(g/zc)*(t2-t1))*sqrt(g/zc)-6.0*deltaX/pow(t2-t1,2.0));
-	double W2 = ((V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc/pow(
+	float W2 = ((V*cosh(sqrt(g/zc)*t1)+W*sinh(sqrt(g/zc)*t1)-6.0*deltaX*zc/pow(
 		t2-t1,2.0)/g)*sinh(sqrt(g/zc)*(t2-t1))*sqrt(g/zc)+(V*sinh(sqrt(g/zc)*t1)*sqrt(g
 		/zc)+W*cosh(sqrt(g/zc)*t1)*sqrt(g/zc)+12.0*deltaX*zc/pow(t2-t1,3.0)/g)*cosh
 		(sqrt(g/zc)*(t2-t1))-12.0*deltaX*zc/pow(t2-t1,3.0)/g)/sqrt(g/zc);
-	double K3 = K2+(V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2)
+	float K3 = K2+(V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2)
 		)-6.0*deltaX2*zc/pow(t4-t3,2.0)/g)*cosh(sqrt(g/zc)*(t4-t3))+(V2*sinh(sqrt(g
 		/zc)*(t3-t2))*sqrt(g/zc)+W2*cosh(sqrt(g/zc)*(t3-t2))*sqrt(g/zc)+12.0*deltaX2
 		*zc/pow(t4-t3,3.0)/g)*sinh(sqrt(g/zc)*(t4-t3))/sqrt(g/zc)+deltaX2-6.0*deltaX2*zc/pow(t4-t3,2.0)/g-zc/g*((
@@ -170,12 +173,12 @@ double hVinitCOMonly (double t, double g, double zc, double delta0, double delta
 		t4-t3,2.0)/g)*cosh(sqrt(g/zc)*(t4-t3))*g/zc+(V2*sinh(sqrt(g/zc)*(t3-t2))*sqrt(g
 		/zc)+W2*cosh(sqrt(g/zc)*(t3-t2))*sqrt(g/zc)+12.0*deltaX2*zc/pow(t4-t3,3.0)/
 		g)*sinh(sqrt(g/zc)*(t4-t3))*sqrt(g/zc)-6.0*deltaX2/pow(t4-t3,2.0));
-	double V3 = zc/g*((V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*
+	float V3 = zc/g*((V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*
 		deltaX2*zc/pow(t4-t3,2.0)/g)*cosh(sqrt(g/zc)*(t4-t3))*g/zc+(V2*sinh(sqrt(g/
 		zc)*(t3-t2))*sqrt(g/zc)+W2*cosh(sqrt(g/zc)*(t3-t2))*sqrt(g/zc)+12.0*deltaX2
 		*zc/pow(t4-t3,3.0)/g)*sinh(sqrt(g/zc)*(t4-t3))*sqrt(g/zc)-6.0*deltaX2/pow(
 		t4-t3,2.0));
-	double W3 = ((V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*deltaX2*
+	float W3 = ((V2*cosh(sqrt(g/zc)*(t3-t2))+W2*sinh(sqrt(g/zc)*(t3-t2))-6.0*deltaX2*
 		zc/pow(t4-t3,2.0)/g)*sinh(sqrt(g/zc)*(t4-t3))*sqrt(g/zc)+(V2*sinh(sqrt(g/
 		zc)*(t3-t2))*sqrt(g/zc)+W2*cosh(sqrt(g/zc)*(t3-t2))*sqrt(g/zc)+12.0*deltaX2
 		*zc/pow(t4-t3,3.0)/g)*cosh(sqrt(g/zc)*(t4-t3))-12.0*deltaX2*zc/pow(t4-t3,
@@ -183,12 +186,12 @@ double hVinitCOMonly (double t, double g, double zc, double delta0, double delta
 	return h(t, g, zc, delta0, deltaX, deltaX2, t1, t2, t3, t4, V, W, K2, V2, W2, K3, V3, W3);
 };
 
-double searchVinit (double g, double zc, double delta0, double deltaX, double deltaX2, double t1, double t2, double t3, double t4, double t5, double pinit)
+float searchVinit (float g, float zc, float delta0, float deltaX, float deltaX2, float t1, float t2, float t3, float t4, float t5, float pinit)
 {
 
-	double vinitBmin = -10.0;
+	float vinitBmin = -10.0;
 
-	double vinitBmax = 10.0;
+	float vinitBmax = 10.0;
 
 	if (
 		hVinitCOMonly(t5, g, zc, delta0, deltaX, deltaX2, t1, t2, t3, t4, t5, pinit, vinitBmin) >= delta0 + deltaX + deltaX2
@@ -214,35 +217,34 @@ double searchVinit (double g, double zc, double delta0, double deltaX, double de
 
 }
 
-void genCOMZMPtrajectory(vector<double> & outputCOM, vector<double> & outputZMP, double incrTime, double zc, double g, double delta0, double deltaX, double deltaX2, double t1, double t2, double t3, double t4, double t5)
-{
-
-	double sensitivityLimit = 0.00001; //because of the instability of the formula.
+void genCOMZMPtrajectory(vector<float> & outputCOM, vector<float> & outputZMP, float incrTime, float zc, float g, float delta0, float deltaX, float deltaX2, float t1, float t2, float t3, float t4, float t5)
+{    
+	float sensitivityLimit = 0.00001; //because of the instability of the formula.
 
 	outputCOM.clear();
 	outputZMP.clear();
-
-	double vinit = searchVinit(g, zc, delta0, deltaX, deltaX2, t1, t2, t3, t4, t5, 0);
-
-	if(abs(deltaX) < sensitivityLimit && abs(deltaX2) < sensitivityLimit) {
-	for(double i = 0.0 ; i < t5 ; i += incrTime)
-	{		
-		outputCOM.push_back(delta0);
-		outputZMP.push_back(delta0);
+	
+	float vinit = searchVinit(g, zc, delta0, deltaX, deltaX2, t1, t2, t3, t4, t5, 0);
+	
+	if(abs(deltaX) < sensitivityLimit && abs(deltaX2) < sensitivityLimit) {	    
+	    for(float i = 0.0 ; i < t5 ; i += incrTime)
+	    {		
+		    outputCOM.push_back(delta0);		    
+		    outputZMP.push_back(delta0);
+	    }
 	}
-	}
-	else {
+	else {    
 
 		int count = 0;
-		int countSav = 0;
-		//double minVal = 99999999;
-		double valPrev = 99999999;
-		double valTmp;
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		unsigned int countSav = 0;
+		//float minVal = 99999999;
+		float valPrev = 99999999;
+		float valTmp;
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 			
-		//fb << i << " " << hVinit(i, g, zc, delta0, deltaX, deltaX2, t1, t2, t3, t4, t5, vinit) << endl;
-		vector<double> ComZmp = hVinit(i, g, zc, delta0, deltaX, deltaX2, t1, t2, t3, t4, t5, 0, vinit);
+		//fb << i << " " << hVinit(i, g, zc, delta0, deltaX, deltaX2, t1, t2, t3, t4, t5, vinit) << endl;				
+		vector<float> ComZmp = hVinit(i, g, zc, delta0, deltaX, deltaX2, t1, t2, t3, t4, t5, 0, vinit);
 
 		outputCOM.push_back(ComZmp[0]);		
 		outputZMP.push_back(ComZmp[1]);
@@ -262,14 +264,11 @@ void genCOMZMPtrajectory(vector<double> & outputCOM, vector<double> & outputZMP,
 		outputCOM[i] = (outputCOM[countSav]*(outputCOM.size()-1-i) + (delta0 + deltaX + deltaX2)*(i-countSav))/(outputCOM.size()-1-countSav);		
 		}	
 		}
-		
-
-		
 	}
 
 }
 
-void genFOOTposition(vector<double> & outputX, vector<double> & outputY, double incrTime, double xinit, double yinit, double xend, double yend, double delay, double t1, double t2, double t3, double t4, double t5, char du)
+void genFOOTposition(vector<float> & outputX, vector<float> & outputY, float incrTime, float xinit, float yinit, float xend, float yend, float delay, float t1, float t2, float t3, float t4, float t5, char du)
 {
 
 	if(du == '2') {
@@ -277,7 +276,7 @@ void genFOOTposition(vector<double> & outputX, vector<double> & outputY, double 
 		outputX.clear();
 		outputY.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2+delay)
@@ -311,7 +310,7 @@ void genFOOTposition(vector<double> & outputX, vector<double> & outputY, double 
 		outputX.clear();
 		outputY.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2)
@@ -345,7 +344,7 @@ void genFOOTposition(vector<double> & outputX, vector<double> & outputY, double 
 		outputX.clear();
 		outputY.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2+delay)
@@ -376,12 +375,12 @@ void genFOOTposition(vector<double> & outputX, vector<double> & outputY, double 
 
 }
 
-void genFOOTheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3, double t4, double t5)
+void genFOOTheight(vector<float> & output, float incrTime, float heightMax, float delay, float t1, float t2, float t3, float t4, float t5)
 {
 
 	output.clear();
 
-	for(double i = 0.0 ; i < t5 ; i += incrTime)
+	for(float i = 0.0 ; i < t5 ; i += incrTime)
 	{
 
 		if(i < t2+delay)
@@ -407,12 +406,12 @@ void genFOOTheight(vector<double> & output, double incrTime, double heightMax, d
 
 }
 
-void genFOOTdownUPheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3)
+void genFOOTdownUPheight(vector<float> & output, float incrTime, float heightMax, float delay, float t1, float t2, float t3)
 {
 
 	output.clear();
 
-	for(double i = 0.0 ; i < t3 ; i += incrTime)
+	for(float i = 0.0 ; i < t3 ; i += incrTime)
 	{
 
 		if(i < t2+delay)
@@ -438,12 +437,12 @@ void genFOOTdownUPheight(vector<double> & output, double incrTime, double height
 
 }
 
-void genFOOTupDOWNheight(vector<double> & output, double incrTime, double heightMax, double delay, double t1, double t2, double t3)
+void genFOOTupDOWNheight(vector<float> & output, float incrTime, float heightMax, float delay, float t1, float t2, float t3)
 {
 
 	output.clear();
 
-	for(double i = 0.0 ; i < t3 ; i += incrTime)
+	for(float i = 0.0 ; i < t3 ; i += incrTime)
 	{
 		if(i < delay) {
 			output.push_back(heightMax);
@@ -464,14 +463,14 @@ void genFOOTupDOWNheight(vector<double> & output, double incrTime, double height
 
 }
 
-void genFOOTorientation(vector<double> & output, double incrTime, double initOrient, double endOrient, double delay, double t1, double t2, double t3, double t4, double t5, char du)
+void genFOOTorientation(vector<float> & output, float incrTime, float initOrient, float endOrient, float delay, float t1, float t2, float t3, float t4, float t5, char du)
 {
 
 	if(du == '2') {
 
 		output.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2+delay)
@@ -501,7 +500,7 @@ void genFOOTorientation(vector<double> & output, double incrTime, double initOri
 
 		output.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2)
@@ -531,7 +530,7 @@ void genFOOTorientation(vector<double> & output, double incrTime, double initOri
 
 		output.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2+delay)
@@ -559,14 +558,14 @@ void genFOOTorientation(vector<double> & output, double incrTime, double initOri
 
 }
 
-void genWAISTorientation(vector<double> & output, double incrTime, double initOrient, double endOrient, double delay, double t1, double t2, double t3, double t4, double t5, char du)
+void genWAISTorientation(vector<float> & output, float incrTime, float initOrient, float endOrient, float delay, float t1, float t2, float t3, float t4, float t5, char du)
 {
 
 	if(du == '2') {
 
 		output.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2+delay)
@@ -595,7 +594,7 @@ void genWAISTorientation(vector<double> & output, double incrTime, double initOr
 
 		output.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2)
@@ -624,7 +623,7 @@ void genWAISTorientation(vector<double> & output, double incrTime, double initOr
 
 		output.clear();
 	
-		for(double i = 0.0 ; i < t5 ; i += incrTime)
+		for(float i = 0.0 ; i < t5 ; i += incrTime)
 		{
 	
 			if(i < t2+delay)
@@ -649,172 +648,235 @@ void genWAISTorientation(vector<double> & output, double incrTime, double initOr
 		}
 
 	}
-
 
 }
 
 //TODO: to save computation time, even though the different trajectories are generated separetely,
 //we should generate them directly in the good vecotr of instantFeatures.
-void produceOneUPHalfStepFeatures(const StepFeatures & stepF, double incrTime, double zc, double g, double t1, double t2, double t3, vector<double> vectUPHalfStep_input, char leftOrRightFootStable)
+void produceOneUPHalfStepFeatures(trajFeatures & tr, float incrTime, float zc, float g, float t1, float t2, float t3, float lateral_distance, float max_height, vector<float> vectUPHalfStep_input, char leftOrRightFootStable)
 {
-
-	vector<double> comTrajX;
-	vector<double> zmpTrajX;
-	genCOMZMPtrajectory(comTrajX, zmpTrajX, incrTime, zc, g, 0, 0, vectUPHalfStep_input[0], t1/2, t1*3/4, t1, t2, t3);
-
-	vector<double> comTrajY;
-	vector<double> zmpTrajY;
-	genCOMZMPtrajectory(comTrajY, zmpTrajY, incrTime, zc, g, 0, 0, vectUPHalfStep_input[1], t1/2, t1*3/4, t1, t2, t3);
-
-	vector<double> footXtraj;
-	vector<double> footYtraj;
-	int leftRightCoef = 0;	
-	if(leftOrRightFootStable == 'L') leftRightCoef = -1; else leftRightCoef = 1;
-	genFOOTposition(footXtraj, footYtraj, incrTime, vectUPHalfStep_input[3], vectUPHalfStep_input[4], vectUPHalfStep_input[0], vectUPHalfStep_input[1]+leftRightCoef*vectUPHalfStep_input[6], DELAY_2, t1, t2, t3, t3, t3, 'u');
-
-	vector<double> footHeight;
-	genFOOTdownUPheight(footHeight, incrTime, vectUPHalfStep_input[7], DELAY_1, t1, t2, t3);
-
-	vector<double> footOrient;
-	genFOOTorientation(footOrient, incrTime, vectUPHalfStep_input[5], 0, DELAY_2, t1, t2, t3, t3, t3, 'u');
-
-	vector<double> stablefootXtraj;
-	vector<double> stablefootYtraj;
-	vector<double> stablefootHeight;
-	vector<double> stablefootOrient;
-
-	int count = -1;
-
-	for(double i = 0.0 ; i < t3 ; i += incrTime)
-	{
-		count++;
-		stablefootXtraj.push_back(vectUPHalfStep_input[0]);
-		stablefootYtraj.push_back(vectUPHalfStep_input[1]);
-		stablefootHeight.push_back(0);
-		stablefootOrient.push_back(0);
+	vector<float> comTrajX;
+	vector<float> zmpTrajX;
+	genCOMZMPtrajectory(comTrajX, zmpTrajX, incrTime, zc, g, 0, 0, -0.5*vectUPHalfStep_input[0], t1/2, t1*3/4, t1, t2, t3);
+	for(unsigned int i = 0; i < comTrajX.size(); i++) {
+	    comTrajX[i] += 0.5*vectUPHalfStep_input[0];
+	    zmpTrajX[i] += 0.5*vectUPHalfStep_input[0];
 	}
-
-	vector<double> waistOrient;
-	genWAISTorientation(waistOrient, incrTime, 0, 0, DELAY_1, t1, t2, t3, t3, t3, 'u');
-
-
-	stepF.comTrajX = comTrajX;
-	stepF.zmpTrajX = zmpTrajX;
-	stepF.comTrajY = comTrajY;
-	stepF.zmpTrajY = zmpTrajY;
-
-	if(leftOrRightFootStable == 'L') {
-	stepF.leftfootXtraj = stablefootXtraj;
-	stepF.leftfootYtraj = stablefootYtraj;
-	stepF.leftfootHeight = stablefootHeight;
-	stepF.leftfootOrient = stablefootOrient;
-	stepF.rightfootXtraj = footXtraj;
-	stepF.rightfootYtraj = footYtraj;
-	stepF.rightfootHeight = footHeight;
-	stepF.rightfootOrient = footOrient;
-	} else {
-	stepF.leftfootXtraj = footXtraj;
-	stepF.leftfootYtraj = footYtraj;
-	stepF.leftfootHeight = footHeight;
-	stepF.leftfootOrient = footOrient;
-	stepF.rightfootXtraj = stablefootXtraj;
-	stepF.rightfootYtraj = stablefootYtraj;
-	stepF.rightfootHeight = stablefootHeight;
-	stepF.rightfootOrient = stablefootOrient;
+	
+	vector<float> comTrajY;
+	vector<float> zmpTrajY;
+	genCOMZMPtrajectory(comTrajY, zmpTrajY, incrTime, zc, g, 0*0.5*vectUPHalfStep_input[1], 0, -0.5*vectUPHalfStep_input[1], t1/2, t1*3/4, t1, t2, t3);			
+	for(unsigned int i = 0; i < comTrajX.size(); i++) {
+	    comTrajY[i] += 0.5*vectUPHalfStep_input[1];
+	    zmpTrajY[i] += 0.5*vectUPHalfStep_input[1];
 	}
+	
+	vector<float> footXtraj;
+	vector<float> footYtraj;
+	int leftRightCoef = 0;
+	if(leftOrRightFootStable == 'L') leftRightCoef = -1; else leftRightCoef = 1;		
+	genFOOTposition(footXtraj, footYtraj, incrTime, vectUPHalfStep_input[0], vectUPHalfStep_input[1], 0, 0+leftRightCoef*lateral_distance, DELAY_2, t1, t2, t3, t3, t3, 'u');
+	
+	vector<float> footHeight;
+	genFOOTdownUPheight(footHeight, incrTime, max_height, DELAY_1, t1, t2, t3);
 
-	stepF.waistOrient =  waistOrient;	
-	stepF.incrTime = incrTime;
-	stepF.zc = zc;
-	stepF.size = waistOrient.size();
+	vector<float> footOrient;
+	genFOOTorientation(footOrient, incrTime, vectUPHalfStep_input[2], 0, DELAY_2, t1, t2, t3, t3, t3, 'u');
 
+	vector<float> waistOrient;
+	genWAISTorientation(waistOrient, incrTime, 0, 0, DELAY_1, t1, t2, t3, t3, t3, 'u');	
+	
+	vector<float> stablefootXtraj(comTrajX.size());
+	vector<float> stablefootYtraj(comTrajX.size());
+	vector<float> stablefootHeight(comTrajX.size());
+	vector<float> stablefootOrient(comTrajX.size());
+	
+// 	for(float i = 0.0 ; i < t3 ; i += incrTime)
+// 	{
+// 		stablefootXtraj.push_back(0);
+// 		stablefootYtraj.push_back(0);
+// 		stablefootHeight.push_back(0);
+// 		stablefootOrient.push_back(0);
+// 	}	
+	
+	tr.traj.resize(waistOrient.size());
+	
+	for(unsigned int i = 0; i < tr.traj.size(); i++) {
+	    
+	    tr.traj[i].comX = comTrajX[i];	    
+	    
+	    tr.traj[i].zmpX = zmpTrajX[i];
+	    tr.traj[i].comY = comTrajY[i];
+	    tr.traj[i].zmpY = zmpTrajY[i];
+	    
+	    if(leftOrRightFootStable == 'L') {
+	    tr.traj[i].leftfootX = stablefootXtraj[i];
+	    tr.traj[i].leftfootY = stablefootYtraj[i];
+	    tr.traj[i].leftfootHeight = stablefootHeight[i];
+	    tr.traj[i].leftfootOrient = stablefootOrient[i];
+	    tr.traj[i].rightfootX = footXtraj[i];
+	    tr.traj[i].rightfootY = footYtraj[i];
+	    tr.traj[i].rightfootHeight = footHeight[i];
+	    tr.traj[i].rightfootOrient = footOrient[i];
+	    } else {
+	    tr.traj[i].leftfootX = footXtraj[i];
+	    tr.traj[i].leftfootY = footYtraj[i];
+	    tr.traj[i].leftfootHeight = footHeight[i];
+	    tr.traj[i].leftfootOrient = footOrient[i];
+	    tr.traj[i].rightfootX = stablefootXtraj[i];
+	    tr.traj[i].rightfootY = stablefootYtraj[i];
+	    tr.traj[i].rightfootHeight = stablefootHeight[i];
+	    tr.traj[i].rightfootOrient = stablefootOrient[i];
+	    }
+	    tr.traj[i].waistOrient =  waistOrient[i];
+	    tr.traj[i].comHeight = zc;	    
+	}
+	
+	tr.incrTime = incrTime;
+	tr.size = waistOrient.size();
 }
 
-void produceOneDOWNHalfStepFeatures(const StepFeatures & stepF, double incrTime, double zc, double g, double t1, double t2, double t3, vector<double> vectDOWNHalfStep_input, char leftOrRightFootStable)
+void produceOneDOWNHalfStepFeatures(trajFeatures & tr, float incrTime, float zc, float g, float t1, float t2, float t3, float lateral_distance, float max_height, vector<float> vectDOWNHalfStep_input, char leftOrRightFootStable)
 {
 
-	vector<double> comTrajX;
-	vector<double> zmpTrajX;
-	genCOMZMPtrajectory(comTrajX, zmpTrajX, incrTime, zc, g, 0, 0, vectDOWNHalfStep_input[2]/2, t1/2, t1*3/4, t1, t2, t3);
+	vector<float> comTrajX;
+	vector<float> zmpTrajX;
+	genCOMZMPtrajectory(comTrajX, zmpTrajX, incrTime, zc, g, 0, 0, vectDOWNHalfStep_input[0]/2, t1/2, t1*3/4, t1, t2, t3);
 
-	vector<double> comTrajY;
-	vector<double> zmpTrajY;
-	genCOMZMPtrajectory(comTrajY, zmpTrajY, incrTime, zc, g, 0, 0, vectDOWNHalfStep_input[3]/2, t1/2, t1*3/4, t1, t2, t3);
+	vector<float> comTrajY;
+	vector<float> zmpTrajY;
+	genCOMZMPtrajectory(comTrajY, zmpTrajY, incrTime, zc, g, 0, 0, vectDOWNHalfStep_input[1]/2, t1/2, t1*3/4, t1, t2, t3);
 
-	vector<double> footXtraj;
-	vector<double> footYtraj;
+	vector<float> footXtraj;
+	vector<float> footYtraj;
 	int leftRightCoef = 0;	
 	if(leftOrRightFootStable == 'L') leftRightCoef = -1; else leftRightCoef = 1;
-	genFOOTposition(footXtraj, footYtraj, incrTime, 0, leftRightCoef*vectDOWNHalfStep_input[0], vectDOWNHalfStep_input[2], vectDOWNHalfStep_input[3], DELAY_2, 0, 0, t1, t2, t3, 'd');
+	genFOOTposition(footXtraj, footYtraj, incrTime, 0, leftRightCoef*lateral_distance, vectDOWNHalfStep_input[0], vectDOWNHalfStep_input[1], DELAY_2, 0, 0, t1, t2, t3, 'd');
 
-	vector<double> footHeight;
-	genFOOTupDOWNheight(footHeight, incrTime, vectDOWNHalfStep_input[1], DELAY_1, t1, t2, t3);
+	vector<float> footHeight;
+	genFOOTupDOWNheight(footHeight, incrTime, max_height, DELAY_1, t1, t2, t3);
 
-	vector<double> footOrient;
-	genFOOTorientation(footOrient, incrTime, 0, vectDOWNHalfStep_input[4], DELAY_2, 0, 0, t1, t2, t3, 'd');
+	vector<float> footOrient;
+	genFOOTorientation(footOrient, incrTime, 0, vectDOWNHalfStep_input[2], DELAY_2, 0, 0, t1, t2, t3, 'd');
 
-	vector<double> waistOrient;
-	genWAISTorientation(waistOrient, incrTime, 0, vectDOWNHalfStep_input[4], DELAY_1, 0, 0, t1, t2, t3, 'd');
+	vector<float> waistOrient;
+	genWAISTorientation(waistOrient, incrTime, 0, vectDOWNHalfStep_input[2], DELAY_1, 0, 0, t1, t2, t3, 'd');
 
-	vector<double> stablefootXtraj;
-	vector<double> stablefootYtraj;
-	vector<double> stablefootHeight;
-	vector<double> stablefootOrient;
+	vector<float> stablefootXtraj(comTrajX.size());
+	vector<float> stablefootYtraj(comTrajX.size());
+	vector<float> stablefootHeight(comTrajX.size());
+	vector<float> stablefootOrient(comTrajX.size());
 
-	for(double i = 0.0 ; i < t3 ; i += incrTime)
-	{
-		stablefootXtraj.push_back(0);
-		stablefootYtraj.push_back(0);
-		stablefootHeight.push_back(0);
-		stablefootOrient.push_back(0);
-	}	
+// 	for(float i = 0.0 ; i < t3 ; i += incrTime)
+// 	{
+// 		stablefootXtraj.push_back(0);
+// 		stablefootYtraj.push_back(0);
+// 		stablefootHeight.push_back(0);
+// 		stablefootOrient.push_back(0);
+// 	}
+	
+	tr.traj.resize(waistOrient.size());
+	
+	for(unsigned int i = 0; i<tr.traj.size(); i++) {
+	    tr.traj[i].comX = comTrajX[i];
+	    tr.traj[i].zmpX = zmpTrajX[i];
+	    tr.traj[i].comY = comTrajY[i];
+	    tr.traj[i].zmpY = zmpTrajY[i];
 
-	stepF.comTrajX = comTrajX;
-	stepF.zmpTrajX = zmpTrajX;
-	stepF.comTrajY = comTrajY;
-	stepF.zmpTrajY = zmpTrajY;
-
-	if(leftOrRightFootStable == 'L') {
-	stepF.leftfootXtraj = stablefootXtraj;
-	stepF.leftfootYtraj = stablefootYtraj;
-	stepF.leftfootHeight = stablefootHeight;
-	stepF.leftfootOrient = stablefootOrient;
-	stepF.rightfootXtraj = footXtraj;
-	stepF.rightfootYtraj = footYtraj;
-	stepF.rightfootHeight = footHeight;
-	stepF.rightfootOrient = footOrient;
-	} else {
-	stepF.leftfootXtraj = footXtraj;
-	stepF.leftfootYtraj = footYtraj;
-	stepF.leftfootHeight = footHeight;
-	stepF.leftfootOrient = footOrient;
-	stepF.rightfootXtraj = stablefootXtraj;
-	stepF.rightfootYtraj = stablefootYtraj;
-	stepF.rightfootHeight = stablefootHeight;
-	stepF.rightfootOrient = stablefootOrient;
+	    if(leftOrRightFootStable == 'L') {
+	    tr.traj[i].leftfootX = stablefootXtraj[i];
+	    tr.traj[i].leftfootY = stablefootYtraj[i];
+	    tr.traj[i].leftfootHeight = stablefootHeight[i];
+	    tr.traj[i].leftfootOrient = stablefootOrient[i];
+	    tr.traj[i].rightfootX = footXtraj[i];
+	    tr.traj[i].rightfootY = footYtraj[i];
+	    tr.traj[i].rightfootHeight = footHeight[i];
+	    tr.traj[i].rightfootOrient = footOrient[i];
+	    } else {
+	    tr.traj[i].leftfootX = footXtraj[i];
+	    tr.traj[i].leftfootY = footYtraj[i];
+	    tr.traj[i].leftfootHeight = footHeight[i];
+	    tr.traj[i].leftfootOrient = footOrient[i];
+	    tr.traj[i].rightfootX = stablefootXtraj[i];
+	    tr.traj[i].rightfootY = stablefootYtraj[i];
+	    tr.traj[i].rightfootHeight = stablefootHeight[i];
+	    tr.traj[i].rightfootOrient = stablefootOrient[i];
+	    }
+	    tr.traj[i].waistOrient =  waistOrient[i];
+	    tr.traj[i].comHeight = zc;
 	}
-
-	stepF.waistOrient =  waistOrient;	
-	stepF.incrTime = incrTime;
-	stepF.zc = zc;
-	stepF.size = waistOrient.size();
-
+	
+	tr.incrTime = incrTime;
+	tr.size = waistOrient.size();
 }
 
 void generate_halfStepFeatures(trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
     
+    char leftOrRightFootStable;
     
+    if(def.support_foot == LEFT) leftOrRightFootStable = 'L'; else leftOrRightFootStable = 'R';
+     
+    float incrTime = 0.005;
+    float zc = def.constants.standard_height;
+    float g = def.constants.g;
+    float t1 = def.constants.t1;
+    float t2 = def.constants.t2;
+    float t3 = def.constants.t3;
+
+    float lateral_distance = def.vp_config.hDistance;
+    float max_height = def.vp_config.maxHeight;
     
+    vector<float> input(3);
+    input[0] = def.pos_and_orient.x;
+    input[1] = def.pos_and_orient.y;
+    input[2] = def.pos_and_orient.theta;
     
+    if(def.half_step_type == UP) {
+	    produceOneUPHalfStepFeatures(t, incrTime, zc, g, t1, t2, t3, lateral_distance, max_height, input, leftOrRightFootStable);
+    } else {
+	    produceOneDOWNHalfStepFeatures(t, incrTime, zc, g, t1, t2, t3, lateral_distance, max_height, input, leftOrRightFootStable);
+    } 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    float supportX = supportconfig.x;
+    float supportY = supportconfig.y;
+    float supportOrient = supportconfig.theta*PI/180;
+
+    for(unsigned int count = 0 ; count < t.size ; count++) {
+
+		float newcomX = (t.traj[count].comX)*cos(supportOrient)
+				-(t.traj[count].comY)*sin(supportOrient)+supportX;
+		float newcomY = (t.traj[count].comX)*sin(supportOrient)
+				+(t.traj[count].comY)*cos(supportOrient)+supportY;
+		float newzmpX = (t.traj[count].zmpX)*cos(supportOrient)
+				-(t.traj[count].zmpY)*sin(supportOrient)+supportX;
+		float newzmpY = (t.traj[count].zmpX)*sin(supportOrient)
+				+(t.traj[count].zmpY)*cos(supportOrient)+supportY;
+		float newlfX = (t.traj[count].leftfootX)*cos(supportOrient)
+				-(t.traj[count].leftfootY)*sin(supportOrient)+supportX;	
+		float newlfY = (t.traj[count].leftfootX)*sin(supportOrient)
+				+(t.traj[count].leftfootY)*cos(supportOrient)+supportY;	
+		float newrfX = (t.traj[count].rightfootX)*cos(supportOrient)
+				-(t.traj[count].rightfootY)*sin(supportOrient)+supportX;
+		float newrfY = (t.traj[count].rightfootX)*sin(supportOrient)   
+				+(t.traj[count].rightfootY)*cos(supportOrient)+supportY;    
+
+		t.traj[count].comX = newcomX;
+		t.traj[count].zmpX = newzmpX;
+
+		t.traj[count].comY = newcomY;
+		t.traj[count].zmpY = newzmpY;
+
+		t.traj[count].leftfootX = newlfX;
+		t.traj[count].leftfootY = newlfY;
+
+		t.traj[count].leftfootOrient += supportconfig.theta;
+
+		t.traj[count].rightfootX = newrfX;
+		t.traj[count].rightfootY = newrfY;
+
+		t.traj[count].rightfootOrient += supportconfig.theta;
+
+		t.traj[count].waistOrient += supportconfig.theta;
+
+    }
 }

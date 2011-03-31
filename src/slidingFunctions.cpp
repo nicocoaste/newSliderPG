@@ -3,153 +3,178 @@
 
 #include "newSliderPG/slidingFunctions.h"
 
-void CnewPGstepStudy::addStepFeaturesWithSlide(
-	StepFeatures & stepF1,
-	StepFeatures & stepF2,	
-	double negativeSlideTime
-	) 
+
+slidingClass::slidingClass(float updo_max, float doup_max) : 
+	maxSlideUpDown(updo_max), maxSlideDownUp(doup_max)
 {
-	
-	//PHASE 1: modify stepF2 according to the change of origin
-	double lastwaistX = stepF1.comTrajX[stepF1.size - 1];
-	double lastwaistY = stepF1.comTrajY[stepF1.size - 1]; 
-	double radlastwaistOrient = stepF1.waistOrient[stepF1.size - 1]*PI/180;
+    
+}
 
-	for(unsigned int count = 0 ; count < stepF2.size ; count++) {
+slidingClass::~slidingClass() 
+{
+    
+}
 
-/*	double newcomX = (stepF2.comTrajX[count]+lastwaistX)*cos(radlastwaistOrient)
-			-(stepF2.comTrajY[count]+lastwaistY)*sin(radlastwaistOrient);
-	double newcomY = (stepF2.comTrajX[count]+lastwaistX)*sin(radlastwaistOrient)
-			+(stepF2.comTrajY[count]+lastwaistY)*cos(radlastwaistOrient);
-	double newzmpX = (stepF2.zmpTrajX[count]+lastwaistX)*cos(radlastwaistOrient)
-			-(stepF2.zmpTrajY[count]+lastwaistY)*sin(radlastwaistOrient);
-	double newzmpY = (stepF2.zmpTrajX[count]+lastwaistX)*sin(radlastwaistOrient)
-			+(stepF2.zmpTrajY[count]+lastwaistY)*cos(radlastwaistOrient);
-	double newlfX = (stepF2.leftfootXtraj[count]+lastwaistX)*cos(radlastwaistOrient)
-			-(stepF2.leftfootYtraj[count]+lastwaistY)*sin(radlastwaistOrient);	
-	double newlfY = (stepF2.leftfootXtraj[count]+lastwaistX)*sin(radlastwaistOrient)
-			+(stepF2.leftfootYtraj[count]+lastwaistY)*cos(radlastwaistOrient);	
-	double newrfX = (stepF2.rightfootXtraj[count]+lastwaistX)*cos(radlastwaistOrient)
-			-(stepF2.rightfootYtraj[count]+lastwaistY)*sin(radlastwaistOrient);
-	double newrfY = (stepF2.rightfootXtraj[count]+lastwaistX)*sin(radlastwaistOrient)   
-			+(stepF2.rightfootYtraj[count]+lastwaistY)*cos(radlastwaistOrient);*/
+void addStepFeaturesWithSlide(
+	trajFeatures & stepF1,
+	trajFeatures & stepF2,
+	float negativeSlideTime
+	) 
+{	
+	if(stepF1.size != 0 && stepF2.size != 0) {
 
-	double newcomX = (stepF2.comTrajX[count])*cos(radlastwaistOrient)
-			-(stepF2.comTrajY[count])*sin(radlastwaistOrient)+lastwaistX;
-	double newcomY = (stepF2.comTrajX[count])*sin(radlastwaistOrient)
-			+(stepF2.comTrajY[count])*cos(radlastwaistOrient)+lastwaistY;
-	double newzmpX = (stepF2.zmpTrajX[count])*cos(radlastwaistOrient)
-			-(stepF2.zmpTrajY[count])*sin(radlastwaistOrient)+lastwaistX;
-	double newzmpY = (stepF2.zmpTrajX[count])*sin(radlastwaistOrient)
-			+(stepF2.zmpTrajY[count])*cos(radlastwaistOrient)+lastwaistY;
-	double newlfX = (stepF2.leftfootXtraj[count])*cos(radlastwaistOrient)
-			-(stepF2.leftfootYtraj[count])*sin(radlastwaistOrient)+lastwaistX;	
-	double newlfY = (stepF2.leftfootXtraj[count])*sin(radlastwaistOrient)
-			+(stepF2.leftfootYtraj[count])*cos(radlastwaistOrient)+lastwaistY;	
-	double newrfX = (stepF2.rightfootXtraj[count])*cos(radlastwaistOrient)
-			-(stepF2.rightfootYtraj[count])*sin(radlastwaistOrient)+lastwaistX;
-	double newrfY = (stepF2.rightfootXtraj[count])*sin(radlastwaistOrient)   
-			+(stepF2.rightfootYtraj[count])*cos(radlastwaistOrient)+lastwaistY;	
+// 	    //PHASE 1: modify stepF2 according to the change of origin
+// 	    float lastwaistX = stepF1.traj[stepF1.size - 1].comX;
+// 	    float lastwaistY = stepF1.traj[stepF1.size - 1].comY; 	
+// 	    float radlastwaistOrient = stepF1.traj[stepF1.size - 1].waistOrient*PI/180;
+// 
+// 	    for(unsigned int count = 0 ; count < stepF2.size ; count++) {
+// 
+// 		float newcomX = (stepF2.traj[count].comX)*cos(radlastwaistOrient)
+// 				-(stepF2.traj[count].comY)*sin(radlastwaistOrient)+lastwaistX;
+// 		float newcomY = (stepF2.traj[count].comX)*sin(radlastwaistOrient)
+// 				+(stepF2.traj[count].comY)*cos(radlastwaistOrient)+lastwaistY;
+// 		float newzmpX = (stepF2.traj[count].zmpX)*cos(radlastwaistOrient)
+// 				-(stepF2.traj[count].zmpY)*sin(radlastwaistOrient)+lastwaistX;
+// 		float newzmpY = (stepF2.traj[count].zmpX)*sin(radlastwaistOrient)
+// 				+(stepF2.traj[count].zmpY)*cos(radlastwaistOrient)+lastwaistY;
+// 		float newlfX = (stepF2.traj[count].leftfootX)*cos(radlastwaistOrient)
+// 				-(stepF2.traj[count].leftfootY)*sin(radlastwaistOrient)+lastwaistX;	
+// 		float newlfY = (stepF2.traj[count].leftfootX)*sin(radlastwaistOrient)
+// 				+(stepF2.traj[count].leftfootY)*cos(radlastwaistOrient)+lastwaistY;	
+// 		float newrfX = (stepF2.traj[count].rightfootX)*cos(radlastwaistOrient)
+// 				-(stepF2.traj[count].rightfootY)*sin(radlastwaistOrient)+lastwaistX;
+// 		float newrfY = (stepF2.traj[count].rightfootX)*sin(radlastwaistOrient)   
+// 				+(stepF2.traj[count].rightfootY)*cos(radlastwaistOrient)+lastwaistY;    
+// 
+// 		stepF2.traj[count].comX = newcomX;
+// 		stepF2.traj[count].zmpX = newzmpX;
+// 
+// 		stepF2.traj[count].comY = newcomY;
+// 		stepF2.traj[count].zmpY = newzmpY;
+// 
+// 		stepF2.traj[count].leftfootX = newlfX;
+// 		stepF2.traj[count].leftfootY = newlfY;
+// 
+// 		stepF2.traj[count].leftfootOrient += stepF1.traj[stepF1.size - 1].waistOrient;
+// 
+// 		stepF2.traj[count].rightfootX = newrfX;
+// 		stepF2.traj[count].rightfootY = newrfY;
+// 
+// 		stepF2.traj[count].rightfootOrient += stepF1.traj[stepF1.size - 1].waistOrient;
+// 
+// 		stepF2.traj[count].waistOrient += stepF1.traj[stepF1.size - 1].waistOrient;
+// 
+// 	    }
+	    
+	    unsigned int delayInt = (int) (abs(negativeSlideTime)/stepF2.incrTime);
 
-	stepF2.comTrajX[count] = newcomX;
-	stepF2.zmpTrajX[count] = newzmpX;
+	    //PHASE 2: add the new stepF2 to stepF1
+	    for(unsigned int count = 0 ; count < stepF2.size ; count++) {
 
-	stepF2.comTrajY[count] = newcomY;
-	stepF2.zmpTrajY[count] = newzmpY;
+		if(count < delayInt) {
 
-	stepF2.leftfootXtraj[count] = newlfX;
-	stepF2.leftfootYtraj[count] = newlfY;
+		    stepF1.traj[stepF1.size - delayInt + count].comX =
+			    (stepF1.traj[stepF1.size - delayInt + count].comX + stepF2.traj[count].comX)
+			    -stepF1.traj[stepF1.size - 1].comX;
+		    stepF1.traj[stepF1.size - delayInt + count].zmpX =
+			    (stepF1.traj[stepF1.size - delayInt + count].zmpX + stepF2.traj[count].zmpX)
+			    -stepF1.traj[stepF1.size - 1].zmpX;
+			    
+		    stepF1.traj[stepF1.size - delayInt + count].comY =
+			    (stepF1.traj[stepF1.size - delayInt + count].comY + stepF2.traj[count].comY)
+			    -stepF1.traj[stepF1.size - 1].comY;
+		    stepF1.traj[stepF1.size - delayInt + count].zmpY =
+			    (stepF1.traj[stepF1.size - delayInt + count].zmpY + stepF2.traj[count].zmpY)
+			    -stepF1.traj[stepF1.size - 1].zmpY;
+			    
+		    stepF1.traj[stepF1.size - delayInt + count].leftfootX =
+			    (stepF1.traj[stepF1.size - delayInt + count].leftfootX + stepF2.traj[count].leftfootX)
+			    -stepF1.traj[stepF1.size - 1].leftfootX;
+		    stepF1.traj[stepF1.size - delayInt + count].leftfootY =
+			    (stepF1.traj[stepF1.size - delayInt + count].leftfootY + stepF2.traj[count].leftfootY)
+			    -stepF1.traj[stepF1.size - 1].leftfootY;
+			    
+		    stepF1.traj[stepF1.size - delayInt + count].leftfootOrient =
+			    (stepF1.traj[stepF1.size - delayInt + count].leftfootOrient + stepF2.traj[count].leftfootOrient)
+			    -stepF1.traj[stepF1.size - 1].leftfootOrient;
+			    
+		    stepF1.traj[stepF1.size - delayInt + count].leftfootHeight =
+			    (stepF1.traj[stepF1.size - delayInt + count].leftfootHeight + stepF2.traj[count].leftfootHeight)
+			    -stepF1.traj[stepF1.size - 1].leftfootHeight;
+			    
+		    stepF1.traj[stepF1.size - delayInt + count].rightfootX =
+			    (stepF1.traj[stepF1.size - delayInt + count].rightfootX + stepF2.traj[count].rightfootX)
+			    -stepF1.traj[stepF1.size - 1].rightfootX;
+		    stepF1.traj[stepF1.size - delayInt + count].rightfootY =
+			    (stepF1.traj[stepF1.size - delayInt + count].rightfootY + stepF2.traj[count].rightfootY)
+			    -stepF1.traj[stepF1.size - 1].rightfootY;
+			    
+		    stepF1.traj[stepF1.size - delayInt + count].rightfootOrient =
+			    (stepF1.traj[stepF1.size - delayInt + count].rightfootOrient + stepF2.traj[count].rightfootOrient)
+			    -stepF1.traj[stepF1.size - 1].rightfootOrient;
+			    
+		    stepF1.traj[stepF1.size - delayInt + count].rightfootHeight =
+			    (stepF1.traj[stepF1.size - delayInt + count].rightfootHeight + stepF2.traj[count].rightfootHeight)
+			    -stepF1.traj[stepF1.size - 1].rightfootHeight;
+		    
+		    stepF1.traj[stepF1.size - delayInt + count].waistOrient =
+			    (stepF1.traj[stepF1.size - delayInt + count].waistOrient + stepF2.traj[count].waistOrient)
+			    -stepF1.traj[stepF1.size - 1].waistOrient;
+			    
+		    stepF1.traj[stepF1.size - delayInt + count].comHeight =
+			    (stepF1.traj[stepF1.size - delayInt + count].comHeight + stepF2.traj[count].comHeight)
+			    -stepF1.traj[stepF1.size - 1].comHeight;
 
-	stepF2.leftfootOrient[count] += stepF1.waistOrient[stepF1.size - 1];
+		} else {
 
-	stepF2.rightfootXtraj[count] = newrfX;
-	stepF2.rightfootYtraj[count] = newrfY;
+		    instantFeatures instFt;
+		    
+		    instFt.comX = stepF2.traj[count].comX;
+		    instFt.zmpX = stepF2.traj[count].zmpX;
+		    
+		    instFt.comY = stepF2.traj[count].comY;
+		    instFt.zmpY = stepF2.traj[count].zmpY;
+		    
+		    instFt.leftfootX = stepF2.traj[count].leftfootX;
+		    instFt.leftfootY = stepF2.traj[count].leftfootY;
+		    
+		    instFt.leftfootOrient = stepF2.traj[count].leftfootOrient;
+		    instFt.leftfootHeight = stepF2.traj[count].leftfootHeight;
+		    
+		    instFt.rightfootX = stepF2.traj[count].rightfootX;
+		    instFt.rightfootY = stepF2.traj[count].rightfootY;
+		    
+		    instFt.rightfootOrient = stepF2.traj[count].rightfootOrient;
+		    instFt.rightfootHeight = stepF2.traj[count].rightfootHeight;
+		    
+		    instFt.waistOrient = stepF2.traj[count].waistOrient;
+		    instFt.comHeight = stepF2.traj[count].comHeight;
+		    
+		    stepF1.traj.push_back(instFt);
+		}
 
-	stepF2.rightfootOrient[count] += stepF1.waistOrient[stepF1.size - 1];
+	    }
 
-	stepF2.waistOrient[count] += stepF1.waistOrient[stepF1.size - 1];	
-
+	    stepF1.size = stepF1.size + stepF2.size - delayInt;
 	}
-
-	int delayInt = (int) (abs(negativeSlideTime)/stepF2.incrTime);
-
-	//PHASE 2: add the new stepF2 to stepF1
-	for(unsigned int count = 0 ; count < stepF2.size ; count++) {
-
-	if(count < delayInt) {
-
-	stepF1.comTrajX[stepF1.size - delayInt + count] =
-		(stepF1.comTrajX[stepF1.size - delayInt + count] + stepF2.comTrajX[count])
-		-stepF1.comTrajX[stepF1.size - 1];
-	stepF1.zmpTrajX[stepF1.size - delayInt + count] =
-		(stepF1.zmpTrajX[stepF1.size - delayInt + count] + stepF2.zmpTrajX[count])
-		-stepF1.zmpTrajX[stepF1.size - 1];
-
-	stepF1.comTrajY[stepF1.size - delayInt + count] =
-		( stepF1.comTrajY[stepF1.size - delayInt + count] + stepF2.comTrajY[count])
-		-stepF1.comTrajY[stepF1.size - 1];
-	stepF1.zmpTrajY[stepF1.size - delayInt + count] =
-		( stepF1.zmpTrajY[stepF1.size - delayInt + count] + stepF2.zmpTrajY[count])
-		-stepF1.zmpTrajY[stepF1.size - 1];
-
-	stepF1.leftfootXtraj[stepF1.size - delayInt + count] =
-		( stepF1.leftfootXtraj[stepF1.size - delayInt + count] + stepF2.leftfootXtraj[count])
-		-stepF1.leftfootXtraj[stepF1.size - 1];
-	stepF1.leftfootYtraj[stepF1.size - delayInt + count] =
-		( stepF1.leftfootYtraj[stepF1.size - delayInt + count] + stepF2.leftfootYtraj[count])
-		-stepF1.leftfootYtraj[stepF1.size - 1];
-
-	stepF1.leftfootOrient[stepF1.size - delayInt + count] =
-		( stepF1.leftfootOrient[stepF1.size - delayInt + count] + stepF2.leftfootOrient[count])
-		-stepF1.leftfootOrient[stepF1.size - 1];
-	stepF1.leftfootHeight[stepF1.size - delayInt + count] =
-		(  stepF1.leftfootHeight[stepF1.size - delayInt + count] + stepF2.leftfootHeight[count])
-		-stepF1.leftfootHeight[stepF1.size - 1];
-
-	stepF1.rightfootXtraj[stepF1.size - delayInt + count] =
-		( stepF1.rightfootXtraj[stepF1.size - delayInt + count] + stepF2.rightfootXtraj[count])
-		-stepF1.rightfootXtraj[stepF1.size - 1];
-	stepF1.rightfootYtraj[stepF1.size - delayInt + count] =
-		( stepF1.rightfootYtraj[stepF1.size - delayInt + count] + stepF2.rightfootYtraj[count])
-		-stepF1.rightfootYtraj[stepF1.size - 1];
-
-	stepF1.rightfootOrient[stepF1.size - delayInt + count] =
-		( stepF1.rightfootOrient[stepF1.size - delayInt + count] + stepF2.rightfootOrient[count])
-		-stepF1.rightfootOrient[stepF1.size - 1];
-	stepF1.rightfootHeight[stepF1.size - delayInt + count] =
-		( stepF1.rightfootHeight[stepF1.size - delayInt + count] + stepF2.rightfootHeight[count])
-		-stepF1.rightfootHeight[stepF1.size - 1];
-
-	stepF1.waistOrient[stepF1.size - delayInt + count] =
-		( stepF1.waistOrient[stepF1.size - delayInt + count] + stepF2.waistOrient[count])
-		-stepF1.waistOrient[stepF1.size - 1];
-
-	} else {
-
-	stepF1.comTrajX.push_back(stepF2.comTrajX[count]);
-	stepF1.zmpTrajX.push_back(stepF2.zmpTrajX[count]);
-
-	stepF1.comTrajY.push_back(stepF2.comTrajY[count]);
-	stepF1.zmpTrajY.push_back(stepF2.zmpTrajY[count]);
-
-	stepF1.leftfootXtraj.push_back(stepF2.leftfootXtraj[count]);
-	stepF1.leftfootYtraj.push_back(stepF2.leftfootYtraj[count]);
-
-	stepF1.leftfootOrient.push_back(stepF2.leftfootOrient[count]);
-	stepF1.leftfootHeight.push_back(stepF2.leftfootHeight[count]);
-
-	stepF1.rightfootXtraj.push_back(stepF2.rightfootXtraj[count]);
-	stepF1.rightfootYtraj.push_back(stepF2.rightfootYtraj[count]);
-
-	stepF1.rightfootOrient.push_back(stepF2.rightfootOrient[count]);
-	stepF1.rightfootHeight.push_back(stepF2.rightfootHeight[count]);
-
-	stepF1.waistOrient.push_back(stepF2.waistOrient[count]);	
-
+	else if(stepF1.size == 0) {
+	    stepF1 = stepF2;    
 	}
+}
 
-	}
+void slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep) {
+    addStepFeaturesWithSlide(t,downward_halfstep,0.0);
+}
 
-	stepF1.size = stepF1.size + stepF2.size - delayInt;
+void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeatures & downward_halfstep) {
+    addStepFeaturesWithSlide(t,downward_halfstep,neg_time);    
+}
 
+void slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
+    addStepFeaturesWithSlide(t,upward_halfstep,0.0);        
+}
+
+void slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, trajFeatures & upward_halfstep) {
+    addStepFeaturesWithSlide(t,upward_halfstep,neg_time);        
 }
