@@ -40,7 +40,7 @@ class SE2 {
     public:
 	float x;
 	float y;
-	float theta;   
+	float theta;   //in radians
     private:
 	friend float dist(SE2 &c1, SE2 & c2);	
 };

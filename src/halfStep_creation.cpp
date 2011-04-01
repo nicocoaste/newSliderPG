@@ -192,23 +192,26 @@ void construction_zmp_com_UPWARD(bool trueX_falseY, trajFeatures & t, const SE2 
     //Now with yinit and y we have our com trajectories.
     //Since it's an upward half-step, the zmp must shift as soon as possible so we use (CASE 1) (see the function y).
 
-    for(unsigned int i = 0 ; i < t.size; i++) {
-	float time = ((float) i) * incrTime;
-	if(time <= def.constants.t_start) {
-	    if(trueX_falseY) {
-		t.traj[i].zmpX = start_value + 0;
-		t.traj[i].comX = start_value + yinit( K, speedinit, time);
+    if(trueX_falseY) {
+	for(unsigned int i = 0 ; i < t.size; i++) {
+	    float time = ((float) i) * incrTime;
+	    if(time <= def.constants.t_start) {
+		    t.traj[i].zmpX = start_value + 0;
+		    t.traj[i].comX = start_value + yinit( K, speedinit, time);	    
 	    } else {
-		t.traj[i].zmpY = start_value + 0;
-		t.traj[i].comY = start_value + yinit( K, speedinit, time);		
-	    }	    
-	} else {
-	    if() {
-		t.traj[i].zmpX = start_value + val*A(B(r,(time - def.constants.t_start)/T));
-		t.traj[i].comX = start_value + y( K, r, val, T, position, speed, (time - def.constants.t_start));
+		    t.traj[i].zmpX = start_value + val*A(B(r,(time - def.constants.t_start)/T));
+		    t.traj[i].comX = start_value + y( K, r, val, T, position, speed, (time - def.constants.t_start));
+	    }
+	}
+    } else {
+	for(unsigned int i = 0 ; i < t.size; i++) {
+	    float time = ((float) i) * incrTime;
+	    if(time <= def.constants.t_start) {
+		    t.traj[i].zmpY = start_value + 0;
+		    t.traj[i].comY = start_value + yinit( K, speedinit, time);			    
 	    } else {
-		t.traj[i].zmpY = start_value + val*A(B(r,(time - def.constants.t_start)/T));
-		t.traj[i].comY = start_value + y( K, r, val, T, position, speed, (time - def.constants.t_start));
+		    t.traj[i].zmpY = start_value + val*A(B(r,(time - def.constants.t_start)/T));
+		    t.traj[i].comY = start_value + y( K, r, val, T, position, speed, (time - def.constants.t_start));
 	    }
 	}
     }
@@ -260,27 +263,164 @@ void construction_zmp_com_DOWNWARD(bool trueX_falseY, trajFeatures & t, const SE
     //Now with yinit and y we have our com trajectories.
     //Since it's a downward half-step, the zmp must shift as late as possible so we use (CASE 2) (see the function y).
 
-    for(unsigned int i = 0 ; i < t.size; i++) {
-	float time = ((float) i) * incrTime;
-	if(time <= def.constants.t_start) {
-	    if(trueX_falseY) {
-		t.traj[i].zmpX = start_value + 0;
-		t.traj[i].comX = start_value + yinit( K, speedinit, time);
+    if(trueX_falseY) {
+	for(unsigned int i = 0 ; i < t.size; i++) {
+	    float time = ((float) i) * incrTime;
+	    if(time <= def.constants.t_start) {
+		    t.traj[i].zmpX = start_value + 0;
+		    t.traj[i].comX = start_value + yinit( K, speedinit, time);
 	    } else {
-		t.traj[i].zmpY = start_value + 0;
-		t.traj[i].comY = start_value + yinit( K, speedinit, time);		
+		    t.traj[i].zmpX = start_value + val - val*A(B(r,T-(time - def.constants.t_start)/T));
+		    t.traj[i].comX = start_value + val - y( K, r, val, T, position, speed, T-(time - def.constants.t_start));
 	    }
-	} else {
-	    if() {
-		t.traj[i].zmpX = start_value + val - val*A(B(r,T-(time - def.constants.t_start)/T));
-		t.traj[i].comX = start_value + val - y( K, r, val, T, position, speed, T-(time - def.constants.t_start));
+	}
+    } else {
+	for(unsigned int i = 0 ; i < t.size; i++) {
+	    float time = ((float) i) * incrTime;
+	    if(time <= def.constants.t_start) {
+		    t.traj[i].zmpY = start_value + 0;
+		    t.traj[i].comY = start_value + yinit( K, speedinit, time);		
 	    } else {
-		t.traj[i].zmpY = start_value + val - val*A(B(r,T-(time - def.constants.t_start)/T));
-		t.traj[i].comY = start_value + val - y( K, r, val, T, position, speed, T-(time - def.constants.t_start));
+		    t.traj[i].zmpY = start_value + val - val*A(B(r,T-(time - def.constants.t_start)/T));
+		    t.traj[i].comY = start_value + val - y( K, r, val, T, position, speed, T-(time - def.constants.t_start));
 	    }
 	}
     }
 }
+
+//com height (upward half-step):
+void construction_comHeight_UPWARD(bool trueX_falseY, trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
+
+    for(unsigned int i = 0 ; i < t.size; i++) {
+	t.traj[i].comHeight = def.constants.standard_height;
+    }    
+}
+
+//com height (downward half-step):
+void construction_comHeight_DOWNWARD(bool trueX_falseY, trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
+
+    for(unsigned int i = 0 ; i < t.size; i++) {
+	t.traj[i].comHeight = def.constants.standard_height;
+    }    
+}
+
+//trajectories of the feet (upward half-step):
+void construction_foot_UPWARD(bool trueX_falseY, trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
+    
+    float incrTime = t.incrTime; 
+    
+    //First we need to know the start point for the swing foot (stored in tmpconfig).
+    SE2 tmpconfig;
+    composeSE2(tmpconfig, supportconfig, def.pos_and_orient);
+    
+    //Then, for the support foot, the trajectory is stationary.
+    if(def.support_foot == LEFT) {
+	for(unsigned int i = 0 ; i < t.size; i++) {
+	    t.traj[i].leftfootX = supportconfig.x;
+	    t.traj[i].leftfootY = supportconfig.y;
+	    t.traj[i].leftfootHeight = 0.0;
+	    t.traj[i].leftfootOrient = supportconfig.theta * 180.0/PI; //in degrees! 
+	}
+    } else {
+	for(unsigned int i = 0 ; i < t.size; i++) {
+	    t.traj[i].rightfootX = supportconfig.x;
+	    t.traj[i].rightfootY = supportconfig.y;
+	    t.traj[i].rightfootHeight = 0.0;
+	    t.traj[i].rightfootOrient = supportconfig.theta * 180.0/PI; //in degrees! 
+	}
+    }
+    
+    //Since it's an upward half-step, the swing foot will go from the start point until the via-point configuration.
+    //Let us calculate this via-point config.
+    SE2 relativeviaconfig;
+    SE2 viaconfig;
+    
+    relativeviaconfig.theta = 0.0;
+    relativeviaconfig.x = 0.0;
+    if(def.support_foot == LEFT) relativeviaconfig.y = -abs(def.vp_config.hDistance);
+    else relativeviaconfig.y = abs(def.vp_config.hDistance);
+    
+    composeSE2(viaconfig, supportconfig, relativeviaconfig);
+    
+    //But before continuing with the horizontal trajectories, the swing foot height (from 0 to maxHeight):
+    //we use the same curve as the ZMP to raise to foot quickly, but with a different (fixed) r coefficient.
+    
+    float T = def.constants.t_total;
+    float val = def.vp_config.maxHeight;
+    float r = 1.015179; //standard value
+    if(def.support_foot == LEFT) {
+	for(unsigned int i = 0 ; i < t.size; i++) {
+	    float time = ((float) i) * incrTime;
+	    t.traj[i].rightfootHeight = val*A(B(r,time/T));
+	}    
+    } else {
+	for(unsigned int i = 0 ; i < t.size; i++) {
+	    float time = ((float) i) * incrTime;
+	    t.traj[i].leftfootHeight = val*A(B(r,time/T));
+	}
+    }
+    
+    //Now we can continue with the horizontal trajectories.
+    //We use a more classical polynomial, of third order, going from a point A to a point B with initial and final speed zero
+    //the start point is tmpconfig, and the end point is viaconfig
+    
+    //We start to move the foot horizontally only after a while:
+    float Tstart = T * 0.30; //arbitrary percentage of T
+    float delta3 = pow(T-Tstart,3);
+    float delta2 = pow(T-Tstart,2);
+    
+    //Along the x-axis:
+    val = viaconfig.x - tmpconfig.x;
+    
+    if(def.support_foot == LEFT) {
+	for(unsigned int i = 0 ; i < t.size; i++) {    
+	    float time = ((float) i) * incrTime;
+	    if(time <= Tstart) {
+		    t.traj[i].rightfootX = tmpconfig.x;    
+	    } else {
+		    t.traj[i].rightfootX = tmpconfig.x + (-2/delta3 * pow(time-Tstart,3) + 3/delta2 * pow(time-Tstart,2)) * val;
+	    }
+	}
+    } else {
+	for(unsigned int i = 0 ; i < t.size; i++) {    
+	    float time = ((float) i) * incrTime;
+	    if(time <= Tstart) {
+		    t.traj[i].leftfootX = tmpconfig.x;    
+	    } else {
+		    t.traj[i].leftfootX = tmpconfig.x + (-2/delta3 * pow(time-Tstart,3) + 3/delta2 * pow(time-Tstart,2)) * val;
+	    }
+	}
+    }
+    
+    //Along the y-axis:
+    val = viaconfig.y - tmpconfig.y; 
+    
+    if(def.support_foot == LEFT) {
+	for(unsigned int i = 0 ; i < t.size; i++) {    
+	    float time = ((float) i) * incrTime;
+	    if(time <= Tstart) {
+		    t.traj[i].rightfootY = tmpconfig.y;    
+	    } else {
+		    t.traj[i].rightfootY = tmpconfig.y + (-2/delta3 * pow(time-Tstart,3) + 3/delta2 * pow(time-Tstart,2)) * val;
+	    }
+	}
+    } else {
+	for(unsigned int i = 0 ; i < t.size; i++) {    
+	    float time = ((float) i) * incrTime;
+	    if(time <= Tstart) {
+		    t.traj[i].leftfootY = tmpconfig.y;    
+	    } else {
+		    t.traj[i].leftfootY = tmpconfig.y + (-2/delta3 * pow(time-Tstart,3) + 3/delta2 * pow(time-Tstart,2)) * val;
+	    }
+	}
+    }
+    
+    
+}
+
+
+
+
 
 
 float w (float t, float g, float zc, float delta0, float deltaX, float t1, float t2, float V, float W)
