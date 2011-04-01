@@ -4,8 +4,29 @@
 #define DELAY_1 0.005
 #define DELAY_2 0.2
 
+// r_param controls "how fast" the zmp will shift.
+// A few possible values:
+// v_100:    1.015179
+// v_99_9:   1.347141
+// v_99_5:   1.558471
+// v_99:     1.692279
+// v_97:     1.988992
+// v_95:     2.177190
+// v_90:     2.507291
+// v_85:     2.754411
+// v_80:     2.962078
+// v_75:     3.146264
+#define r_PARAM 1.347141
+
 #include "newSliderPG/halfStep_creation.h"
 
+//a handy function that takes a global SE2 vector vref (in the reference frame), and a SE2 vector vrel relative to vref,
+//and constructs the global SE2 vector corresponding to the configuration described by vrel, but given in the reference frame.
+void composeSE2( SE2 & resultVect, const SE2 & globalVect, const SE2 & relativeVect) {
+    resultVect.x = x + relativeVect.x * cos(-globalVect.theta) - relativeVect.y * sin(-globalVect.theta);
+    resultVect.y = y + relativeVect.x * sin(-globalVect.theta) + relativeVect.y * cos(-globalVect.theta);
+    resultVect.theta = globalVect.theta + relativeVect.theta;    
+}
 
 float A( float x ) {    
     return x*x*(2-x)*(2-x);               
@@ -24,16 +45,18 @@ float B( float r, float x ) {
 // position = the start point of the com, i.e. the y function (but the zmp starts at zero.
 // speed = the initial speed of the com
 // x is actually the time, so the main variable.
+// 
 // 	There are 2 way to use y:
 // 	(CASE 1:) without change: it corresponds to starting at 'position' and aiming at 'val', 
-// 	          going to 'val' as fast as possible
+// 	          moving the zmp towards 'val' as soon as possible.
 // 	(CASE 2:) using    val - y(K,r,val,T,position,speed,T-x):
-// 	          it corresponds to starting at 'val' and aiming at 'position', staying
-// 	          near position as long as possible.
-// 	In the 2 cases, different zmp curves are obtained:
+// 	          it also corresponds to starting at 'position' and aiming at 'val', but this
+// 	          time the zmp stays near 'position' as long as possible.
+// 
+// 	In the 2 cases, the zmp curves are obtained:
 // 	(CASE 1): val*A(B(r,x/T))
-// 	(CASE 2): val - val*A(B(r,T-x/T)) 
-double y( float K, float r, float val, float T, float position, double speed, float x) {
+// 	(CASE 2): val - val*A(B(r,T-x/T))
+float y( float K, float r, float val, float T, float position, double speed, float x) {
     
     float x2 = x*x;
     float x3 = x2 * x;
@@ -59,7 +82,7 @@ double y( float K, float r, float val, float T, float position, double speed, fl
     float K3 = K2 * K;
     float K4 = K3 * K;
         
-    double result = (exp(x/sqrt(K))*((speed*sqrt(K)+position)*T8+(-8*r2-16*r-8)*val*K*T6+val*(24*r3*sqrt(K)+120*r2*sqrt(K)+120*r*sqrt(K)+24*sqrt(K))*K*T5+
+    float result = (exp(x/sqrt(K))*((speed*sqrt(K)+position)*T8+(-8*r2-16*r-8)*val*K*T6+val*(24*r3*sqrt(K)+120*r2*sqrt(K)+120*r*sqrt(K)+24*sqrt(K))*K*T5+
 (-24*r4-384*r3-816*r2-384*r-24)*val*K2*T4+val*(480*r4*sqrt(K)+2880*r3*sqrt(K)+2880*r2*sqrt(K)+480*r*sqrt(K))*K2*T3+(-4320*r4-11520*r3-4320*r2)*
 val*K3*T2+val*(20160*r4*sqrt(K)+20160*r3*sqrt(K))*K3*T-40320*r4*val*K4))/(2*T8)+(exp(-x/sqrt(K))*((position-speed*sqrt(K))*T8+(-8*r2-16*r-8)*val*K*T6
 +val*(-24*r3*sqrt(K)-120*r2*sqrt(K)-120*r*sqrt(K)-24*sqrt(K))*K*T5+(-24*r4-384*r3-816*r2-384*r-24)*val*K2*T4+val*
@@ -77,7 +100,7 @@ val*K3*T2+val*(20160*r4*sqrt(K)+20160*r3*sqrt(K))*K3*T-40320*r4*val*K4))/(2*T8)+
 };
 
 //This function y_adjust is used to adjust the speed parameter in the function y
-double y_adjust(float K, float r, float val, float T, float position, float x) {
+double y_adjust(float K, float r, float val, float T, float position) {
     
     double MIN_SPEED, MAX_SPEED;
     if( val > position ) {
@@ -90,9 +113,9 @@ double y_adjust(float K, float r, float val, float T, float position, float x) {
     }
     
     double CURRENT_SPEED = (MAX_SPEED + MIN_SPEED) / 2.0;
-    double result = y(K, r, val, T, position, CURRENT_SPEED, T);
+    float result = y(K, r, val, T, position, CURRENT_SPEED, T);
     
-    while( abs(result - val) > 0.001 ) {
+    while( abs(result - val) > 0.0001 ) {
 	if(result > val) {
 	    MAX_SPEED = CURRENT_SPEED;
 	    CURRENT_SPEED = (MAX_SPEED + MIN_SPEED) / 2.0;
@@ -107,6 +130,157 @@ double y_adjust(float K, float r, float val, float T, float position, float x) {
     return CURRENT_SPEED;   
 }
 
+//Once the init speed has been found with y_adjust, we need to reach the intitial position 'position'.
+//To do so we use this function which corresponds to the com for a zmp staying at zero:
+float yinit( float K, double speedinit, float x) {
+   float sqrtK = sqrt(K);
+   float expp = exp(x/sqrtK);
+   return speedinit*sqrtK/2*(expp - 1/expp);  
+}
+
+//but we need to find the good value speedinit which depends on the time we let (tref), and the
+//value of 'position'
+double findspeedinit( float K, float position, float tref) {
+   double sqrtK = sqrt(K);
+   double expp = exp(tref/sqrtK);
+   return (2*position*expp)/(sqrtK*(expp*expp-1));
+}
+
+//Here we suppose that the size of the trajFeatures t, t.size, which depends on the parameters in def, has already been correctly set.
+//We also assume that t.incrTime has already been set.
+//This function is used to create the zmp and com trajectories along the x or y axis, in the case of an UPWARD half-step.
+void construction_zmp_com_UPWARD(bool trueX_falseY, trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
+    
+    float incrTime = t.incrTime; 
+
+    //First, we need to calculate the start value, and the end value.
+    //Since it's an upward half-step, the start value is at the barycenter of the feet, and the end_value is at the center of the support foot.
+    
+    SE2 tmpconfig;
+    composeSE2(tmpconfig, supportconfig, def.pos_and_orient);
+    
+    float start_value, end_value;
+    if(trueX_falseY) {
+	float start_value = (tmpconfig.x + support_config.x) / 2.0;
+	float end_value = tmpconfig.x;
+    } else {
+	float start_value = (tmpconfig.y + support_config.y) / 2.0;
+	float end_value = tmpconfig.y;
+    }
+    //the delta between these values is:
+    float val = end_value - start_value;
+    
+    float K = def.constants.standard_height / def.constants.g;
+    float r = r_PARAM;
+    float T = def.constants.t_total - def.constants.t_start;
+    
+    //Now we need to calculate the value of 'position', which depends on the 
+    //dimensions of the feet.
+    float position;
+    float partialradius = 0.5 * min(def.ft_dim.width,def.ft_dim.length);
+    if(val < 0) {
+	position = max(-partialradius, 0.3*val); //'position' should stay relatively small compare to 'val'
+    }
+    else position = min(partialradius, 0.3*val);
+    
+    
+    //now we compute the intermediate speed, i.e. the speed of the com at tref = def.constants.t_start
+    double speed = y_adjust(K, r, val, T, position);
+    //we also compute the initial speed: 
+    double speedinit = findspeedinit( K, position, def.constants.t_start);
+    
+    //Now with yinit and y we have our com trajectories.
+    //Since it's an upward half-step, the zmp must shift as soon as possible so we use (CASE 1) (see the function y).
+
+    for(unsigned int i = 0 ; i < t.size; i++) {
+	float time = ((float) i) * incrTime;
+	if(time <= def.constants.t_start) {
+	    if(trueX_falseY) {
+		t.traj[i].zmpX = start_value + 0;
+		t.traj[i].comX = start_value + yinit( K, speedinit, time);
+	    } else {
+		t.traj[i].zmpY = start_value + 0;
+		t.traj[i].comY = start_value + yinit( K, speedinit, time);		
+	    }	    
+	} else {
+	    if() {
+		t.traj[i].zmpX = start_value + val*A(B(r,(time - def.constants.t_start)/T));
+		t.traj[i].comX = start_value + y( K, r, val, T, position, speed, (time - def.constants.t_start));
+	    } else {
+		t.traj[i].zmpY = start_value + val*A(B(r,(time - def.constants.t_start)/T));
+		t.traj[i].comY = start_value + y( K, r, val, T, position, speed, (time - def.constants.t_start));
+	    }
+	}
+    }
+}
+
+//Here we suppose that the size of the trajFeatures t, t.size, which depends on the parameters in def, has already been correctly set.
+//We also assume that t.incrTime has already been set.
+//This function is used to create the zmp and com trajectories along the x or y axis, in the case of a DOWNWARD half-step.
+void construction_zmp_com_DOWNWARD(bool trueX_falseY, trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
+    
+    float incrTime = t.incrTime; 
+
+    //First, we need to calculate the start value, and the end value.
+    //Since it's a downward half-step, the start value is at the center of the support foot, and the end_value is at the barycenter of the feet.
+    
+    SE2 tmpconfig;
+    composeSE2(tmpconfig, supportconfig, def.pos_and_orient);
+    
+    float start_value, end_value;
+    if(trueX_falseY) {
+	float start_value = tmpconfig.x;
+	float end_value = (tmpconfig.x + support_config.x) / 2.0;
+    } else {
+	float start_value = tmpconfig.y;
+	float end_value = (tmpconfig.y + support_config.y) / 2.0;
+    }
+    //the delta between these values is:
+    float val = end_value - start_value;
+    
+    float K = def.constants.standard_height / def.constants.g;
+    float r = r_PARAM;
+    float T = def.constants.t_total - def.constants.t_start;
+    
+    //Now we need to calculate the value of 'position', which depends on the 
+    //dimensions of the feet.
+    float position;
+    float partialradius = 0.5 * min(def.ft_dim.width,def.ft_dim.length);
+    if(val < 0) {
+	position = max(-partialradius, 0.3*val); //'position' should stay relatively small compare to 'val'
+    }
+    else position = min(partialradius, 0.3*val);
+    
+    
+    //now we compute the intermediate speed, i.e. the speed of the com at tref = def.constants.t_start
+    double speed = y_adjust(K, r, val, T, position);
+    //we also compute the initial speed: 
+    double speedinit = findspeedinit( K, position, def.constants.t_start);
+    
+    //Now with yinit and y we have our com trajectories.
+    //Since it's a downward half-step, the zmp must shift as late as possible so we use (CASE 2) (see the function y).
+
+    for(unsigned int i = 0 ; i < t.size; i++) {
+	float time = ((float) i) * incrTime;
+	if(time <= def.constants.t_start) {
+	    if(trueX_falseY) {
+		t.traj[i].zmpX = start_value + 0;
+		t.traj[i].comX = start_value + yinit( K, speedinit, time);
+	    } else {
+		t.traj[i].zmpY = start_value + 0;
+		t.traj[i].comY = start_value + yinit( K, speedinit, time);		
+	    }
+	} else {
+	    if() {
+		t.traj[i].zmpX = start_value + val - val*A(B(r,T-(time - def.constants.t_start)/T));
+		t.traj[i].comX = start_value + val - y( K, r, val, T, position, speed, T-(time - def.constants.t_start));
+	    } else {
+		t.traj[i].zmpY = start_value + val - val*A(B(r,T-(time - def.constants.t_start)/T));
+		t.traj[i].comY = start_value + val - y( K, r, val, T, position, speed, T-(time - def.constants.t_start));
+	    }
+	}
+    }
+}
 
 
 float w (float t, float g, float zc, float delta0, float deltaX, float t1, float t2, float V, float W)
@@ -753,6 +927,9 @@ void genWAISTorientation(vector<float> & output, float incrTime, float initOrien
 	}
 
 }
+
+
+
 
 //TODO: to save computation time, even though the different trajectories are generated separetely,
 //we should generate them directly in the good vecotr of instantFeatures.

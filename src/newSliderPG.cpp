@@ -3,14 +3,6 @@
 
 #include "newSliderPG/newSliderPG.h"
 
-#ifndef min
-# define min(X, Y)  ((X) < (Y) ? (X) : (Y))
-#endif
-
-#ifndef max
-# define max(X, Y)  ((X) < (Y) ? (Y) : (X))
-#endif
-
 using namespace std;
 
 CnewSliderPG::CnewSliderPG()

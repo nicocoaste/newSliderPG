@@ -22,6 +22,14 @@
 # define PI 3.14159265359
 #endif
 
+#ifndef min
+# define min(X, Y)  ((X) < (Y) ? (X) : (Y))
+#endif
+
+#ifndef max
+# define max(X, Y)  ((X) < (Y) ? (Y) : (X))
+#endif
+
 using namespace std;
 
 /*!
@@ -45,9 +53,8 @@ class SE2 {
  */
 struct hsConstants {
 	float g;
-	float t1;
-	float t2;
-	float t3;
+	float t_start;
+	float t_total;
 	float standard_height;
 };
 
