@@ -27,20 +27,18 @@ int main (int argc, char *argv[]) {
   
   float body_height;
   char left_or_right;
-  float t1, t2, t3;
+  float t_start, t_total;
   float incrTime, gravity;
   float hDistance, maxHeight;
   string gnuplot_steps, gnuplot_comzmpx, gnuplot_comzmpy, gnuplot_height;
-
   is >> bufstring >> body_height; 
   is >> bufstring >> left_or_right;
   is >> bufstring >> incrTime;
   is >> bufstring >> gravity;
   is >> bufstring >> hDistance;
   is >> bufstring >> maxHeight;
-  is >> bufstring >> t1;
-  is >> bufstring >> t2;
-  is >> bufstring >> t3;
+  is >> bufstring >> t_start;
+  is >> bufstring >> t_total;
   is >> bufstring >> gnuplot_steps;
   is >> bufstring >> gnuplot_comzmpx;
   is >> bufstring >> gnuplot_comzmpy;	
@@ -82,13 +80,13 @@ int main (int argc, char *argv[]) {
   hsConstants hsc;
   hsc.g = gravity;
   hsc.standard_height = body_height;
-  hsc.t1 = t1;
-  hsc.t2 = t2;
-  hsc.t3 = t3;
+  hsc.t_start = t_start;
+  hsc.t_total = t_total;
   NSPG->set_constants(hsc);
   
   trajFeatures t;
   t.size = 0;
+  t.incrTime = incrTime;
   
   NSPG->produceTraj(t, stepsVect);
   
