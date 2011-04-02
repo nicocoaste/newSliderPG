@@ -3,6 +3,17 @@
 
 #include "newSliderPG/slidingFunctions.h"
 
+#ifndef PI
+# define PI 3.14159265359
+#endif
+
+#ifndef MIN
+# define MIN(X, Y)  ((X) < (Y) ? (X) : (Y))
+#endif
+
+#ifndef MAX
+# define MAX(X, Y)  ((X) < (Y) ? (Y) : (X))
+#endif
 
 slidingClass::slidingClass(float updo_max, float doup_max) : 
 	maxSlideUpDown(updo_max), maxSlideDownUp(doup_max)

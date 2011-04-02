@@ -18,18 +18,6 @@
 #include <vector>
 #include <set>
 
-#ifndef PI
-# define PI 3.14159265359
-#endif
-
-#ifndef min
-# define min(X, Y)  ((X) < (Y) ? (X) : (Y))
-#endif
-
-#ifndef max
-# define max(X, Y)  ((X) < (Y) ? (Y) : (X))
-#endif
-
 using namespace std;
 
 /*!

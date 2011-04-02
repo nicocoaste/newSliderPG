@@ -3,6 +3,18 @@
 
 #include "newSliderPG/newSliderPG.h"
 
+#ifndef PI
+# define PI 3.14159265359
+#endif
+
+#ifndef MIN
+# define MIN(X, Y)  ((X) < (Y) ? (X) : (Y))
+#endif
+
+#ifndef MAX
+# define MAX(X, Y)  ((X) < (Y) ? (Y) : (X))
+#endif
+
 using namespace std;
 
 CnewSliderPG::CnewSliderPG()
@@ -121,10 +133,10 @@ void CnewSliderPG::drawTraj(ofstream & fb, const trajFeatures & t, const vector<
 
 		}
 
-		leftBound = min(leftBound,-centre_y-0.24*coefFeet);
-		rightBound = max(rightBound,-centre_y+0.24*coefFeet);
-		downBound = min(downBound,centre_x-0.24*coefFeet);
-		upBound = max(upBound,centre_x+0.24*coefFeet);
+		leftBound = MIN(leftBound,-centre_y-0.24*coefFeet);
+		rightBound = MAX(rightBound,-centre_y+0.24*coefFeet);
+		downBound = MIN(downBound,centre_x-0.24*coefFeet);
+		upBound = MAX(upBound,centre_x+0.24*coefFeet);
 
 		vector<float> cosinuss (4, 0);
 		vector<float> sinuss (4, 0);
@@ -167,7 +179,7 @@ void CnewSliderPG::drawTraj(ofstream & fb, const trajFeatures & t, const vector<
 
 	float squareCenter_h = (rightBound + leftBound)/2;
 	float squareCenter_v = (upBound + downBound)/2;
-	float halfSide = max((rightBound - leftBound)/2,(upBound - downBound)/2);
+	float halfSide = MAX((rightBound - leftBound)/2,(upBound - downBound)/2);
 
 	leftBound = squareCenter_h - halfSide;
 	rightBound = squareCenter_h + halfSide;

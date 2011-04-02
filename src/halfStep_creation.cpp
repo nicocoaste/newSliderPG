@@ -4,6 +4,18 @@
 #define DELAY_1 0.001
 #define DELAY_2 0.001
 
+#ifndef PI
+# define PI 3.14159265359
+#endif
+
+#ifndef MIN
+# define MIN(X, Y)  ((X) < (Y) ? (X) : (Y))
+#endif
+
+#ifndef MAX
+# define MAX(X, Y)  ((X) < (Y) ? (Y) : (X))
+#endif
+
 // r_param controls "how fast" the zmp will shift.
 // A few possible values:
 // v_100:    1.015179
@@ -191,11 +203,11 @@ void construction_zmp_com_UPWARD(bool trueX_falseY, trajFeatures & t, const SE2 
     //Now we need to calculate the value of 'position', which depends on the 
     //dimensions of the feet.
     float position;
-    float partialradius = p_GAP * 0.5 * min(def.ft_dim.width,def.ft_dim.length);
+    float partialradius = p_GAP * 0.5 * MIN(def.ft_dim.width,def.ft_dim.length);
     if(val < 0) {
-	position = max(-partialradius, 0.3*val); //'position' should stay relatively small compare to 'val'
+	position = MAX(-partialradius, 0.3*val); //'position' should stay relatively small compare to 'val'
     }
-    else position = min(partialradius, 0.3*val);
+    else position = MIN(partialradius, 0.3*val);
     
     
     //now we compute the intermediate speed, i.e. the speed of the com at tref = def.constants.t_start
@@ -262,11 +274,11 @@ void construction_zmp_com_DOWNWARD(bool trueX_falseY, trajFeatures & t, const SE
     //Now we need to calculate the value of 'position', which depends on the 
     //dimensions of the feet.
     float position;
-    float partialradius = p_GAP * 0.5 * min(def.ft_dim.width,def.ft_dim.length);
+    float partialradius = p_GAP * 0.5 * MIN(def.ft_dim.width,def.ft_dim.length);
     if(val < 0) {
-	position = max(-partialradius, 0.3*val); //'position' should stay relatively small compare to 'val'
+	position = MAX(-partialradius, 0.3*val); //'position' should stay relatively small compare to 'val'
     }
-    else position = min(partialradius, 0.3*val);
+    else position = MIN(partialradius, 0.3*val);
     
     
     //now we compute the intermediate speed, i.e. the speed of the com at tref = def.constants.t_start 
@@ -362,7 +374,7 @@ void construction_feet_UPWARD(trajFeatures & t, const SE2 & supportconfig, const
     //we use the same curve as the ZMP to raise the foot quickly, but with a different (fixed) r coefficient.  
     //The important thing is: the foot can only be raised when the ZMP is inside the support foot.
     //SO WE ASSUME THAT THE ZMP TRAJECTORY HAS ALREADY BEEN COMPUTED
-    float radius = 0.5 * min(def.ft_dim.width,def.ft_dim.length);
+    float radius = 0.5 * MIN(def.ft_dim.width,def.ft_dim.length);
     float T = def.constants.t_total;
     float val = def.vp_config.maxHeight;
     float r = 1.015179; //standard value
@@ -515,7 +527,7 @@ void construction_feet_DOWNWARD(trajFeatures & t, const SE2 & supportconfig, con
     //The important thing is: the foot must touch the ground BEFORE the ZMP leaves the support foot.
     //SO WE ASSUME THAT THE ZMP TRAJECTORY HAS ALREADY BEEN COMPUTED, 
     //and first, we use a dichotomy to obtain the time when the ZMP leaves the support foot (time_zmp_out).    
-    float radius = 0.5 * min(def.ft_dim.width,def.ft_dim.length);
+    float radius = 0.5 * MIN(def.ft_dim.width,def.ft_dim.length);
     float time_zmp_out;
     float min_time = 0.0;
     float max_time = def.constants.t_total;
@@ -531,6 +543,16 @@ void construction_feet_DOWNWARD(trajFeatures & t, const SE2 & supportconfig, con
 	}
     }
     time_zmp_out = current_tzo;    
+    
+    //Just to try something:
+    //it puts the moment when the foot lands on the ground a bit later.
+    //Theoretically, it's not very good since the zmp might already be outside the 
+    //polygon of support, but it corresponds to the moment when the humans 
+    //start to rotate around the tip of the foot (using the toes) with the support foot.
+    //Therefore, this modification can be used to obtain a more "human" walk,
+    //and besides, singularities become less likely to occur, so the steps can 
+    //be larger.
+    time_zmp_out = MIN(current_tzo + 0.5, def.constants.t_total);
           
     float T = time_zmp_out;
     float val = -def.vp_config.maxHeight;
@@ -559,7 +581,7 @@ void construction_feet_DOWNWARD(trajFeatures & t, const SE2 & supportconfig, con
     //Of course, the orientation can only change when to foot is in the air.
     float delta3 = pow(T,3);
     float delta2 = pow(T,2);
-    val = -def.pos_and_orient.theta; //assuming that def.pos_and_orient.theta is well defined (e.g. not PI/4+2PI instead of PI/4)
+    val = def.pos_and_orient.theta; //assuming that def.pos_and_orient.theta is well defined (e.g. not PI/4+2PI instead of PI/4)
 
     if(def.support_foot == LEFT) {
 	for(unsigned int i = 0 ; i < t.size; i++) {    
@@ -589,7 +611,7 @@ void construction_feet_DOWNWARD(trajFeatures & t, const SE2 & supportconfig, con
     float Tstop = T * h_PER; //see a definition of h_PER above
     delta3 = pow(Tstop,3);
     delta2 = pow(Tstop,2);
-    
+   
     //Along the x-axis:
     val = tmpconfig.x - viaconfig.x;
     
