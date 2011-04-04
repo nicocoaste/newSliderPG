@@ -327,7 +327,7 @@ void construction_comHeight_UPWARD(trajFeatures & t, const SE2 & supportconfig, 
     float T = def.constants.t_total;       
     for(unsigned int i = 0 ; i < t.size; i++) {
 	float time = ((float) i) * incrTime;
-	t.traj[i].comHeight = def.constants.standard_height + U(0.30,B(1.015179,time/T)) * def.constants.standard_height * 0.06; //parameters are to be tuned
+	t.traj[i].comHeight = def.constants.standard_height + U(0.30,B(1.015179,time/T)) * def.constants.standard_height * 0.04; //parameters are to be tuned
     }    
 }
 
@@ -338,7 +338,7 @@ void construction_comHeight_DOWNWARD(trajFeatures & t, const SE2 & supportconfig
     float T = def.constants.t_total;       
     for(unsigned int i = 0 ; i < t.size; i++) {
 	float time = ((float) i) * incrTime;
-	t.traj[i].comHeight = def.constants.standard_height + U(0.30,B(1.015179,1-time/T)) * def.constants.standard_height * 0.06; //parameters are to be tuned
+	t.traj[i].comHeight = def.constants.standard_height + U(0.30,B(1.015179,1-time/T)) * def.constants.standard_height * 0.04; //parameters are to be tuned
     }    
     
 }

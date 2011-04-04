@@ -88,6 +88,7 @@ struct trajFeatures {
 	 */
 	float incrTime;
 	unsigned int size;
+	vector<int> contact_indexes; //the indexes corresponding to either a foot landing or leaving the ground.
 };
 
 /*!
