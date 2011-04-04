@@ -316,20 +316,31 @@ void construction_zmp_com_DOWNWARD(bool trueX_falseY, trajFeatures & t, const SE
     }
 }
 
+float U( float t, float x ) {    
+    return x*x*( (3/(2*t-1))*x*x + (-(4*t+4)/(2*t-1))*x + (6*t/(2*t-1)) );                
+}
+
 //com height (upward half-step):
 void construction_comHeight_UPWARD(trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
 
+    float incrTime = t.incrTime; 
+    float T = def.constants.t_total;       
     for(unsigned int i = 0 ; i < t.size; i++) {
-	t.traj[i].comHeight = def.constants.standard_height;
+	float time = ((float) i) * incrTime;
+	t.traj[i].comHeight = def.constants.standard_height + U(0.30,B(1.015179,time/T)) * def.constants.standard_height * 0.06; //parameters are to be tuned
     }    
 }
 
 //com height (downward half-step):
 void construction_comHeight_DOWNWARD(trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
 
+    float incrTime = t.incrTime; 
+    float T = def.constants.t_total;       
     for(unsigned int i = 0 ; i < t.size; i++) {
-	t.traj[i].comHeight = def.constants.standard_height;
+	float time = ((float) i) * incrTime;
+	t.traj[i].comHeight = def.constants.standard_height + U(0.30,B(1.015179,1-time/T)) * def.constants.standard_height * 0.06; //parameters are to be tuned
     }    
+    
 }
 
 //trajectories of the feet (upward half-step):            -WE ASSUME THAT THE ZMP TRAJECTORY HAS ALREADY BEEN COMPUTED-
