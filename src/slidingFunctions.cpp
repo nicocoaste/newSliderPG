@@ -11,6 +11,10 @@
 //The minimum duration of the double support (in s.):
 #define MIN_DOUBLE_SUPPORT_TIME 0.1
 
+//The minimum coefficient for the trajectory smoothing (for example, with 1.0 the 
+//trajectory is not modified, and for 0.0 the feet height will always be 0):
+#define MIN_PERCENT_REDUCTION 0.1
+
 #ifndef PI
 # define PI 3.14159265359
 #endif
@@ -23,8 +27,7 @@
 # define MAX(X, Y)  ((X) < (Y) ? (Y) : (X))
 #endif
 
-slidingClass::slidingClass(float updo_max, float doup_max) : 
-	maxSlideUpDown(updo_max), maxSlideDownUp(doup_max)
+slidingClass::slidingClass()
 {
     
 }
@@ -142,15 +145,15 @@ void slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_half
     addStepFeaturesWithSlide(t,downward_halfstep,0.0);    
 }
 
-void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeatures & downward_halfstep) {
+void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep) {
     
     int ind = t.size-1;
     int startindex, endindex, prestartindex, postendindex;
     float leftXstart, rightXstart, leftYstart, rightYstart;
     float leftXfinal, rightXfinal, leftYfinal, rightYfinal;
     while(t.traj[ind].rightfootHeight > 0.0000001 || t.traj[ind].leftfootHeight > 0.0000001) {
-	t.traj[ind].rightfootHeight *= 0.3;
-	t.traj[ind].leftfootHeight *= 0.3;
+	t.traj[ind].rightfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
+	t.traj[ind].leftfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
 	
 	if(t.traj[ind].rightfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT || t.traj[ind].leftfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT) 
 	    startindex = ind;
@@ -160,8 +163,8 @@ void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeature
     }
     ind = 0;
     while(downward_halfstep.traj[ind].rightfootHeight > 0.0000001 || downward_halfstep.traj[ind].leftfootHeight > 0.0000001) {	
-	downward_halfstep.traj[ind].rightfootHeight *= 0.3;
-	downward_halfstep.traj[ind].leftfootHeight *= 0.3;
+	downward_halfstep.traj[ind].rightfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
+	downward_halfstep.traj[ind].leftfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
 	
 	if(downward_halfstep.traj[ind].rightfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT || downward_halfstep.traj[ind].leftfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT)
 	    endindex = ind;
@@ -184,15 +187,15 @@ void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeature
     float delta3 = pow(T, 3);
     float delta2 = pow(T, 2);
    
-    for(int i = startindex; i < t.size ; i++) {
+    for(int i = startindex; i < (int) t.size ; i++) {
 	float tmp_leftX = leftXstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (leftXfinal - leftXstart);
 	float tmp_leftY = leftYstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (leftYfinal - leftYstart);
 	float tmp_rightX = rightXstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (rightXfinal - rightXstart);
 	float tmp_rightY = rightYstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (rightYfinal - rightYstart);	
-	t.traj[i].leftfootX = 0.5*(t.traj[i].leftfootX - tmp_leftX) + tmp_leftX;
-	t.traj[i].leftfootY = 0.5*(t.traj[i].leftfootY - tmp_leftY) + tmp_leftY;
-	t.traj[i].rightfootX = 0.5*(t.traj[i].rightfootX - tmp_rightX) + tmp_rightX;
-	t.traj[i].rightfootY = 0.5*(t.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
+	t.traj[i].leftfootX = MAX(reduction, MIN_PERCENT_REDUCTION)*(t.traj[i].leftfootX - tmp_leftX) + tmp_leftX;
+	t.traj[i].leftfootY = MAX(reduction, MIN_PERCENT_REDUCTION)*(t.traj[i].leftfootY - tmp_leftY) + tmp_leftY;
+	t.traj[i].rightfootX = MAX(reduction, MIN_PERCENT_REDUCTION)*(t.traj[i].rightfootX - tmp_rightX) + tmp_rightX;
+	t.traj[i].rightfootY = MAX(reduction, MIN_PERCENT_REDUCTION)*(t.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
     }
 
     for(int i = 0; i < endindex ; i++) {
@@ -200,10 +203,10 @@ void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeature
 	float tmp_leftY = leftYstart + (-2/delta3 * pow(i+t.size-startindex,3) + 3/delta2 * pow(i+t.size-startindex,2)) * (leftYfinal - leftYstart);
 	float tmp_rightX = rightXstart + (-2/delta3 * pow(i+t.size-startindex,3) + 3/delta2 * pow(i+t.size-startindex,2)) * (rightXfinal - rightXstart);
 	float tmp_rightY = rightYstart + (-2/delta3 * pow(i+t.size-startindex,3) + 3/delta2 * pow(i+t.size-startindex,2)) * (rightYfinal - rightYstart);
-	downward_halfstep.traj[i].leftfootX = 0.5*(downward_halfstep.traj[i].leftfootX - tmp_leftX) + tmp_leftX;
-	downward_halfstep.traj[i].leftfootY = 0.5*(downward_halfstep.traj[i].leftfootY - tmp_leftY) + tmp_leftY;
-	downward_halfstep.traj[i].rightfootX = 0.5*(downward_halfstep.traj[i].rightfootX - tmp_rightX) + tmp_rightX;
-	downward_halfstep.traj[i].rightfootY = 0.5*(downward_halfstep.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
+	downward_halfstep.traj[i].leftfootX = MAX(reduction, MIN_PERCENT_REDUCTION)*(downward_halfstep.traj[i].leftfootX - tmp_leftX) + tmp_leftX;
+	downward_halfstep.traj[i].leftfootY = MAX(reduction, MIN_PERCENT_REDUCTION)*(downward_halfstep.traj[i].leftfootY - tmp_leftY) + tmp_leftY;
+	downward_halfstep.traj[i].rightfootX = MAX(reduction, MIN_PERCENT_REDUCTION)*(downward_halfstep.traj[i].rightfootX - tmp_rightX) + tmp_rightX;
+	downward_halfstep.traj[i].rightfootY = MAX(reduction, MIN_PERCENT_REDUCTION)*(downward_halfstep.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
     }      
     
     addStepFeaturesWithSlide(t,downward_halfstep, MAX(neg_time, bound_slide) );   
@@ -213,7 +216,7 @@ void slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfst
     addStepFeaturesWithSlide(t,upward_halfstep,0.0);        
 }
 
-void slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, trajFeatures & upward_halfstep) {        
+void slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & upward_halfstep) {        
        
     int ind = t.size-1;
     int prestartindex, postendindex;

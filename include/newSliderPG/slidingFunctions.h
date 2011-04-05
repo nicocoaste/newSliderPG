@@ -41,7 +41,7 @@ class slidingClass {
 	/*!
 	 * Constructor.
 	 */
-	slidingClass(float updo_max = 0.0, float doup_max = 0.0);
+	slidingClass();
 	/*!
 	 * Destructor.
 	*/
@@ -59,7 +59,7 @@ class slidingClass {
 	/*!
 	 * Similar to slideUpDownMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
 	 */
-	void slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeatures & downward_halfstep);
+	void slideUpDownCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep);
 
 
 	/*!
@@ -74,7 +74,7 @@ class slidingClass {
 	/*!
 	 * Similar to slideDownUpMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
 	 */
-	void slideDownUpCOEF(trajFeatures & t, float neg_time, trajFeatures & downward_halfstep);
+	void slideDownUpCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep);
 	
     private:
 	/*!
@@ -82,20 +82,6 @@ class slidingClass {
 	 * example include self-collision checks.
 	 */
 	CheckValidity validator;
-	
-	/*!
-	 * Used by slideUpDown; maxSlideUpDown is a
-	 * float between 0.0 and 1.0 giving the maximum percentage of the next half-step
-	 * that can be slided on the current trajFeatures;
-	 */
-	float maxSlideUpDown;
-	
-	/*!
-	 * Used by slideUpDown; maxSlideUpDown is a
-	 * float between 0.0 and 1.0 giving the maximum percentage of the next half-step
-	 * that can be slided on the current trajFeatures;
-	 */
-	float maxSlideDownUp;
 };
 
 #endif
