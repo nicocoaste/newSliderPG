@@ -688,10 +688,10 @@ void construction_waistOrient_DOWNWARD(trajFeatures & t, const SE2 & supportconf
 
 void generate_halfStepFeatures(trajFeatures & t, const SE2 & supportconfig, const halfStepDefinition & def) {
         
-    cout << supportconfig.x << " " << supportconfig.y << " " << supportconfig.theta*180.0/PI << " ||| " << def.pos_and_orient.x << " " << def.pos_and_orient.y << " " << def.pos_and_orient.theta*180.0/PI << endl;
+//     cout << supportconfig.x << " " << supportconfig.y << " " << supportconfig.theta*180.0/PI << " ||| " << def.pos_and_orient.x << " " << def.pos_and_orient.y << " " << def.pos_and_orient.theta*180.0/PI << endl;
     SE2 tmpc;
     composeSE2(tmpc, supportconfig, def.pos_and_orient);
-    cout << "__________ " << tmpc.x << " " << tmpc.y << " " << tmpc.theta*180.0/PI << endl;   
+//     cout << "__________ " << tmpc.x << " " << tmpc.y << " " << tmpc.theta*180.0/PI << endl;   
     
     //t.incrTime is assumed to be already defined
     t.traj.clear();

@@ -135,70 +135,62 @@ void slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_half
 }
 
 void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeatures & downward_halfstep) {
-    addStepFeaturesWithSlide(t,downward_halfstep,neg_time);
-    float leftXfinal = downward_halfstep.traj[downward_halfstep.size-1].leftfootX;
-    float leftYfinal = downward_halfstep.traj[downward_halfstep.size-1].leftfootY;    
-    float rightXfinal = downward_halfstep.traj[downward_halfstep.size-1].rightfootX;
-    float rightYfinal = downward_halfstep.traj[downward_halfstep.size-1].rightfootY;
+    
+    int ind = t.size-1;
+    int startindex, endindex;
     float leftXstart, rightXstart, leftYstart, rightYstart;
-    int trigger = false;        
-    int trigger2 = false;
-    int endindex, startindex;       
-    
-    for(unsigned int i = t.contact_indexes[t.contact_indexes.size()-1]; i < t.size; i++) {
-	if(trigger) {
-
-	    t.traj[i].rightfootHeight *= 0.3;
-	    t.traj[i].leftfootHeight *= 0.3;
-	    
-	    if(t.traj[i].rightfootHeight > 0.02 || t.traj[i].leftfootHeight > 0.02) { //This height is to be tuned
-		trigger2 = true;
-		startindex = i;
-	    }
-	    if(trigger2 && t.traj[i].rightfootHeight < 0.015 && t.traj[i].leftfootHeight < 0.015) { //This height is to be tuned
-		endindex = i;
-	    }
-	}
-	if(!trigger && t.traj[i].rightfootHeight < 0.001 && t.traj[i].leftfootHeight < 0.001) {
-	    trigger = true;
-	    leftXstart = t.traj[i].leftfootX;
-	    leftYstart = t.traj[i].leftfootY;
-	    rightXstart = t.traj[i].rightfootX;
-	    rightYstart = t.traj[i].rightfootY;    
-	}
+    float leftXfinal, rightXfinal, leftYfinal, rightYfinal;
+    while(t.traj[ind].rightfootHeight > 0.01 || t.traj[ind].leftfootHeight > 0.01) {
+	t.traj[ind].rightfootHeight *= 0.3;
+	t.traj[ind].leftfootHeight *= 0.3;
+	
+	startindex = ind;
+	ind--;
     }
+    ind = 0;
+    while(downward_halfstep.traj[ind].rightfootHeight > 0.01 || downward_halfstep.traj[ind].leftfootHeight > 0.01) {	
+	downward_halfstep.traj[ind].rightfootHeight *= 0.3;
+	downward_halfstep.traj[ind].leftfootHeight *= 0.3;
+	
+	endindex = ind;
+	ind++;
+    }   
     
-    float delta3 = pow(endindex - startindex + 1,3);
-    float delta2 = pow(endindex - startindex + 1,2);
-    
-    for(int i = startindex; i <= endindex ; i++) {
+    leftXstart = t.traj[startindex].leftfootX;
+    leftYstart = t.traj[startindex].leftfootY;
+    rightXstart = t.traj[startindex].rightfootX;
+    rightYstart = t.traj[startindex].rightfootY;          
+    leftXfinal = downward_halfstep.traj[endindex].leftfootX;
+    leftYfinal = downward_halfstep.traj[endindex].leftfootY;
+    rightXfinal = downward_halfstep.traj[endindex].rightfootX;
+    rightYfinal = downward_halfstep.traj[endindex].rightfootY;          
+    float T = (float) t.size - startindex + endindex + 1;
+    float delta3 = pow(T, 3);
+    float delta2 = pow(T, 2);
+   
+    for(int i = startindex; i < t.size ; i++) {
 	float tmp_leftX = leftXstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (leftXfinal - leftXstart);
 	float tmp_leftY = leftYstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (leftYfinal - leftYstart);
 	float tmp_rightX = rightXstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (rightXfinal - rightXstart);
-	float tmp_rightY = rightYstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (rightYfinal - rightYstart);
-	
+	float tmp_rightY = rightYstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (rightYfinal - rightYstart);	
 	t.traj[i].leftfootX = 0.5*(t.traj[i].leftfootX - tmp_leftX) + tmp_leftX;
 	t.traj[i].leftfootY = 0.5*(t.traj[i].leftfootY - tmp_leftY) + tmp_leftY;
 	t.traj[i].rightfootX = 0.5*(t.traj[i].rightfootX - tmp_rightX) + tmp_rightX;
 	t.traj[i].rightfootY = 0.5*(t.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
     }
 
-//     float delta3 = pow(t.contact_indexes[t.contact_indexes.size()-1] - t.size,3);
-//     float delta2 = pow(endindex - startindex + 1,2);
-//     
-//     for(int i = t.contact_indexes[t.contact_indexes.size()-1]; i < t.size ; i++) {
-// 	float tmp_leftX = leftXstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (leftXfinal - leftXstart);
-// 	float tmp_leftY = leftYstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (leftYfinal - leftYstart);
-// 	float tmp_rightX = rightXstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (rightXfinal - rightXstart);
-// 	float tmp_rightY = rightYstart + (-2/delta3 * pow(i-startindex,3) + 3/delta2 * pow(i-startindex,2)) * (rightYfinal - rightYstart);
-// 	
-// 	t.traj[i].leftfootX *= 0.0*(t.traj[i].leftfootX - tmp_leftX) + tmp_leftX;
-// 	t.traj[i].leftfootY *= 0.0*(t.traj[i].leftfootY - tmp_leftY) + tmp_leftY;
-// 	t.traj[i].rightfootX *= 0.0*(t.traj[i].rightfootX - tmp_rightX) + tmp_rightX;
-// 	t.traj[i].rightfootY *= 0.0*(t.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
-//     }
+    for(int i = 0; i < endindex ; i++) {
+	float tmp_leftX = leftXstart + (-2/delta3 * pow(i+t.size-startindex,3) + 3/delta2 * pow(i+t.size-startindex,2)) * (leftXfinal - leftXstart);
+	float tmp_leftY = leftYstart + (-2/delta3 * pow(i+t.size-startindex,3) + 3/delta2 * pow(i+t.size-startindex,2)) * (leftYfinal - leftYstart);
+	float tmp_rightX = rightXstart + (-2/delta3 * pow(i+t.size-startindex,3) + 3/delta2 * pow(i+t.size-startindex,2)) * (rightXfinal - rightXstart);
+	float tmp_rightY = rightYstart + (-2/delta3 * pow(i+t.size-startindex,3) + 3/delta2 * pow(i+t.size-startindex,2)) * (rightYfinal - rightYstart);
+	downward_halfstep.traj[i].leftfootX = 0.5*(downward_halfstep.traj[i].leftfootX - tmp_leftX) + tmp_leftX;
+	downward_halfstep.traj[i].leftfootY = 0.5*(downward_halfstep.traj[i].leftfootY - tmp_leftY) + tmp_leftY;
+	downward_halfstep.traj[i].rightfootX = 0.5*(downward_halfstep.traj[i].rightfootX - tmp_rightX) + tmp_rightX;
+	downward_halfstep.traj[i].rightfootY = 0.5*(downward_halfstep.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
+    }      
     
-    t.contact_indexes.push_back(t.size-1);
+    addStepFeaturesWithSlide(t,downward_halfstep,neg_time);   
 }
 
 void slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
@@ -206,6 +198,5 @@ void slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfst
 }
 
 void slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, trajFeatures & upward_halfstep) {        
-    addStepFeaturesWithSlide(t,upward_halfstep,neg_time);    
-    t.contact_indexes.push_back(t.size-upward_halfstep.size);
+    addStepFeaturesWithSlide(t,upward_halfstep,neg_time);
 }

@@ -49,14 +49,13 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 	hsdef.constants = constants;
 	
 	t.traj.clear();
-	t.contact_indexes.clear();
-	t.contact_indexes.push_back(1);
+// 	t.contact_indexes.clear();
 	t.size = 0;
 	
 	trajFeatures t_tmp;
 	t_tmp.incrTime = t.incrTime;
 	t_tmp.size = 0;
-	t_tmp.contact_indexes.clear();
+// 	t_tmp.contact_indexes.clear();
 	
 	for(int i=2; i < (int) (vect_input.size()-6)/5+2 ; i++)
 	{       	  
