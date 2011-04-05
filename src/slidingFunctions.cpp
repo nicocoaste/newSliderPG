@@ -3,6 +3,14 @@
 
 #include "newSliderPG/slidingFunctions.h"
 
+//During the smoothing, the foot can start to move horizontally very early, 
+//but we still want the tae-off and the landing to be vertical, so we define 
+//a minimum height (in m.) for the foot to move horizontally:
+#define MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT 0.001
+
+//The minimum duration of the double support (in s.):
+#define MIN_DOUBLE_SUPPORT_TIME 0.1
+
 #ifndef PI
 # define PI 3.14159265359
 #endif
@@ -137,33 +145,41 @@ void slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_half
 void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeatures & downward_halfstep) {
     
     int ind = t.size-1;
-    int startindex, endindex;
+    int startindex, endindex, prestartindex, postendindex;
     float leftXstart, rightXstart, leftYstart, rightYstart;
     float leftXfinal, rightXfinal, leftYfinal, rightYfinal;
-    while(t.traj[ind].rightfootHeight > 0.01 || t.traj[ind].leftfootHeight > 0.01) {
+    while(t.traj[ind].rightfootHeight > 0.0000001 || t.traj[ind].leftfootHeight > 0.0000001) {
 	t.traj[ind].rightfootHeight *= 0.3;
 	t.traj[ind].leftfootHeight *= 0.3;
 	
-	startindex = ind;
+	if(t.traj[ind].rightfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT || t.traj[ind].leftfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT) 
+	    startindex = ind;
+	
+	prestartindex = ind;
 	ind--;
     }
     ind = 0;
-    while(downward_halfstep.traj[ind].rightfootHeight > 0.01 || downward_halfstep.traj[ind].leftfootHeight > 0.01) {	
+    while(downward_halfstep.traj[ind].rightfootHeight > 0.0000001 || downward_halfstep.traj[ind].leftfootHeight > 0.0000001) {	
 	downward_halfstep.traj[ind].rightfootHeight *= 0.3;
 	downward_halfstep.traj[ind].leftfootHeight *= 0.3;
 	
-	endindex = ind;
+	if(downward_halfstep.traj[ind].rightfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT || downward_halfstep.traj[ind].leftfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT)
+	    endindex = ind;
+	
+	postendindex = ind;
 	ind++;
     }   
     
-    leftXstart = t.traj[startindex].leftfootX;
-    leftYstart = t.traj[startindex].leftfootY;
-    rightXstart = t.traj[startindex].rightfootX;
-    rightYstart = t.traj[startindex].rightfootY;          
-    leftXfinal = downward_halfstep.traj[endindex].leftfootX;
-    leftYfinal = downward_halfstep.traj[endindex].leftfootY;
-    rightXfinal = downward_halfstep.traj[endindex].rightfootX;
-    rightYfinal = downward_halfstep.traj[endindex].rightfootY;          
+    float bound_slide = -t.incrTime * (t.size - startindex);
+    
+    leftXstart = t.traj[prestartindex].leftfootX;
+    leftYstart = t.traj[prestartindex].leftfootY;
+    rightXstart = t.traj[prestartindex].rightfootX;
+    rightYstart = t.traj[prestartindex].rightfootY;          
+    leftXfinal = downward_halfstep.traj[postendindex].leftfootX;
+    leftYfinal = downward_halfstep.traj[postendindex].leftfootY;
+    rightXfinal = downward_halfstep.traj[postendindex].rightfootX;
+    rightYfinal = downward_halfstep.traj[postendindex].rightfootY;          
     float T = (float) t.size - startindex + endindex + 1;
     float delta3 = pow(T, 3);
     float delta2 = pow(T, 2);
@@ -190,7 +206,7 @@ void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, trajFeature
 	downward_halfstep.traj[i].rightfootY = 0.5*(downward_halfstep.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
     }      
     
-    addStepFeaturesWithSlide(t,downward_halfstep,neg_time);   
+    addStepFeaturesWithSlide(t,downward_halfstep, MAX(neg_time, bound_slide) );   
 }
 
 void slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
@@ -198,5 +214,25 @@ void slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfst
 }
 
 void slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, trajFeatures & upward_halfstep) {        
-    addStepFeaturesWithSlide(t,upward_halfstep,neg_time);
+       
+    int ind = t.size-1;
+    int prestartindex, postendindex;
+    if(t.size != 0) {
+	while(t.traj[ind].rightfootHeight < 0.0000001 && t.traj[ind].leftfootHeight < 0.0000001) {
+	    prestartindex = ind;
+	    ind--;
+	}
+    } else {
+	prestartindex = 0;
+    }
+    
+    ind = 0;
+    while(upward_halfstep.traj[ind].rightfootHeight < 0.0000001 && upward_halfstep.traj[ind].leftfootHeight < 0.0000001) {	
+	postendindex = ind;
+	ind++;
+    }  
+    
+    float bound_slide = MIN(-t.incrTime * (t.size - prestartindex) - t.incrTime * (postendindex) + MIN_DOUBLE_SUPPORT_TIME, 0.0);    
+    
+    addStepFeaturesWithSlide(t,upward_halfstep, MAX(neg_time, bound_slide) );
 }
