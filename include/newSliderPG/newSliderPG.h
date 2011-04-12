@@ -2,7 +2,6 @@
  *  Copyright AIST-CNRS Joint Robotics Laboratory
  *  Author: Nicolas Perrin
  *
- *  Convention: m_ for public members, mp_ for private members.
  */
 
 #ifndef NEWSLIDERPG_H
@@ -121,6 +120,11 @@ class CnewSliderPG
 		 *           orientation of the FSwF when the first step is just finished.\n             
 		 */
 		void produceTraj(trajFeatures & t, const vector<float> & vect_input);
+		
+		/*!
+		 * This time we define also the initial absolute position of the com AND the initial absolute orientation of the first support foot:
+		 */
+		void produceTraj(trajFeatures & t, const vector<float> & vect_input, float x_com_init, float y_com_init, float theta_supportfoot_init);
 		
 		/*! drawSteps outputs a file intended for gnuplot.
 		 * Let's say that the result of drawSteps is in the 

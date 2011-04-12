@@ -53,13 +53,14 @@ class slidingClass {
 	* an object trajFeatures corresponding to a downward half-step.
 	* The last config of the first trajFeatures MUST be the same as the first config
 	* of the second trajFeatures.
+	* The integer returned is the index in t when the new half-step will start.
 	*/
-	void slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep);
+	int slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep);
 	
 	/*!
 	 * Similar to slideUpDownMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
 	 */
-	void slideUpDownCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep);
+	int slideUpDownCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep);
 
 
 	/*!
@@ -68,13 +69,14 @@ class slidingClass {
 	* an object trajFeatures corresponding to an upward half-step.
 	* The last config of the first trajFeatures MUST be the same as the first config
 	* of the second trajFeatures.
+	* The integer returned is the index in t when the new half-step will start.
 	*/
-	void slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep);
+	int slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep);
 	
 	/*!
 	 * Similar to slideDownUpMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
 	 */
-	void slideDownUpCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep);
+	int slideDownUpCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep);
 	
     private:
 	/*!

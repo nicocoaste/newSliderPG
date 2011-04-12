@@ -86,6 +86,7 @@ struct trajFeatures {
 	/*!
 	 * traj is a discretized trajectory and incrTime is the duration of one discretization step (in s.).
 	 */
+	vector<int> halfSteps_startindexes;
 	float incrTime;
 	unsigned int size;
 };

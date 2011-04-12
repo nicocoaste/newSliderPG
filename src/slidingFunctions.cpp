@@ -37,115 +37,118 @@ slidingClass::~slidingClass()
     
 }
 
-void addStepFeaturesWithSlide(
-	trajFeatures & stepF1,
-	trajFeatures & stepF2,
+int addStepFeaturesWithSlide(
+	trajFeatures & t1,
+	trajFeatures & t2,
 	float negativeSlideTime
 	) 
 {
-	if(stepF1.size != 0 && stepF2.size != 0) {
+	if(t1.size != 0 && t2.size != 0) {
 	    
-	    unsigned int delayInt = (int) (abs(negativeSlideTime)/stepF2.incrTime);
+	    unsigned int delayInt = (int) (abs(negativeSlideTime)/t2.incrTime);
 
-	    //PHASE 2: add the new stepF2 to stepF1
-	    for(unsigned int count = 0 ; count < stepF2.size ; count++) {
+	    //PHASE 2: add the new t2 to t1
+	    for(unsigned int count = 0 ; count < t2.size ; count++) {
 
 		if(count < delayInt) {
 
-		    stepF1.traj[stepF1.size - delayInt + count].comX =
-			    (stepF1.traj[stepF1.size - delayInt + count].comX + stepF2.traj[count].comX)
-			    -stepF1.traj[stepF1.size - 1].comX;
-		    stepF1.traj[stepF1.size - delayInt + count].zmpX =
-			    (stepF1.traj[stepF1.size - delayInt + count].zmpX + stepF2.traj[count].zmpX)
-			    -stepF1.traj[stepF1.size - 1].zmpX;
+		    t1.traj[t1.size - delayInt + count].comX =
+			    (t1.traj[t1.size - delayInt + count].comX + t2.traj[count].comX)
+			    -t1.traj[t1.size - 1].comX;
+		    t1.traj[t1.size - delayInt + count].zmpX =
+			    (t1.traj[t1.size - delayInt + count].zmpX + t2.traj[count].zmpX)
+			    -t1.traj[t1.size - 1].zmpX;
 			    
-		    stepF1.traj[stepF1.size - delayInt + count].comY =
-			    (stepF1.traj[stepF1.size - delayInt + count].comY + stepF2.traj[count].comY)
-			    -stepF1.traj[stepF1.size - 1].comY;
-		    stepF1.traj[stepF1.size - delayInt + count].zmpY =
-			    (stepF1.traj[stepF1.size - delayInt + count].zmpY + stepF2.traj[count].zmpY)
-			    -stepF1.traj[stepF1.size - 1].zmpY;
+		    t1.traj[t1.size - delayInt + count].comY =
+			    (t1.traj[t1.size - delayInt + count].comY + t2.traj[count].comY)
+			    -t1.traj[t1.size - 1].comY;
+		    t1.traj[t1.size - delayInt + count].zmpY =
+			    (t1.traj[t1.size - delayInt + count].zmpY + t2.traj[count].zmpY)
+			    -t1.traj[t1.size - 1].zmpY;
 			    
-		    stepF1.traj[stepF1.size - delayInt + count].leftfootX =
-			    (stepF1.traj[stepF1.size - delayInt + count].leftfootX + stepF2.traj[count].leftfootX)
-			    -stepF1.traj[stepF1.size - 1].leftfootX;
-		    stepF1.traj[stepF1.size - delayInt + count].leftfootY =
-			    (stepF1.traj[stepF1.size - delayInt + count].leftfootY + stepF2.traj[count].leftfootY)
-			    -stepF1.traj[stepF1.size - 1].leftfootY;
+		    t1.traj[t1.size - delayInt + count].leftfootX =
+			    (t1.traj[t1.size - delayInt + count].leftfootX + t2.traj[count].leftfootX)
+			    -t1.traj[t1.size - 1].leftfootX;
+		    t1.traj[t1.size - delayInt + count].leftfootY =
+			    (t1.traj[t1.size - delayInt + count].leftfootY + t2.traj[count].leftfootY)
+			    -t1.traj[t1.size - 1].leftfootY;
 			    
-		    stepF1.traj[stepF1.size - delayInt + count].leftfootOrient =
-			    (stepF1.traj[stepF1.size - delayInt + count].leftfootOrient + stepF2.traj[count].leftfootOrient)
-			    -stepF1.traj[stepF1.size - 1].leftfootOrient;
+		    t1.traj[t1.size - delayInt + count].leftfootOrient =
+			    (t1.traj[t1.size - delayInt + count].leftfootOrient + t2.traj[count].leftfootOrient)
+			    -t1.traj[t1.size - 1].leftfootOrient;
 			    
-		    stepF1.traj[stepF1.size - delayInt + count].leftfootHeight =
-			    (stepF1.traj[stepF1.size - delayInt + count].leftfootHeight + stepF2.traj[count].leftfootHeight)
-			    -stepF1.traj[stepF1.size - 1].leftfootHeight;
+		    t1.traj[t1.size - delayInt + count].leftfootHeight =
+			    (t1.traj[t1.size - delayInt + count].leftfootHeight + t2.traj[count].leftfootHeight)
+			    -t1.traj[t1.size - 1].leftfootHeight;
 			    
-		    stepF1.traj[stepF1.size - delayInt + count].rightfootX =
-			    (stepF1.traj[stepF1.size - delayInt + count].rightfootX + stepF2.traj[count].rightfootX)
-			    -stepF1.traj[stepF1.size - 1].rightfootX;
-		    stepF1.traj[stepF1.size - delayInt + count].rightfootY =
-			    (stepF1.traj[stepF1.size - delayInt + count].rightfootY + stepF2.traj[count].rightfootY)
-			    -stepF1.traj[stepF1.size - 1].rightfootY;
+		    t1.traj[t1.size - delayInt + count].rightfootX =
+			    (t1.traj[t1.size - delayInt + count].rightfootX + t2.traj[count].rightfootX)
+			    -t1.traj[t1.size - 1].rightfootX;
+		    t1.traj[t1.size - delayInt + count].rightfootY =
+			    (t1.traj[t1.size - delayInt + count].rightfootY + t2.traj[count].rightfootY)
+			    -t1.traj[t1.size - 1].rightfootY;
 			    
-		    stepF1.traj[stepF1.size - delayInt + count].rightfootOrient =
-			    (stepF1.traj[stepF1.size - delayInt + count].rightfootOrient + stepF2.traj[count].rightfootOrient)
-			    -stepF1.traj[stepF1.size - 1].rightfootOrient;
+		    t1.traj[t1.size - delayInt + count].rightfootOrient =
+			    (t1.traj[t1.size - delayInt + count].rightfootOrient + t2.traj[count].rightfootOrient)
+			    -t1.traj[t1.size - 1].rightfootOrient;
 			    
-		    stepF1.traj[stepF1.size - delayInt + count].rightfootHeight =
-			    (stepF1.traj[stepF1.size - delayInt + count].rightfootHeight + stepF2.traj[count].rightfootHeight)
-			    -stepF1.traj[stepF1.size - 1].rightfootHeight;
+		    t1.traj[t1.size - delayInt + count].rightfootHeight =
+			    (t1.traj[t1.size - delayInt + count].rightfootHeight + t2.traj[count].rightfootHeight)
+			    -t1.traj[t1.size - 1].rightfootHeight;
 		    
-		    stepF1.traj[stepF1.size - delayInt + count].waistOrient =
-			    (stepF1.traj[stepF1.size - delayInt + count].waistOrient + stepF2.traj[count].waistOrient)
-			    -stepF1.traj[stepF1.size - 1].waistOrient;
+		    t1.traj[t1.size - delayInt + count].waistOrient =
+			    (t1.traj[t1.size - delayInt + count].waistOrient + t2.traj[count].waistOrient)
+			    -t1.traj[t1.size - 1].waistOrient;
 			    
-		    stepF1.traj[stepF1.size - delayInt + count].comHeight =
-			    (stepF1.traj[stepF1.size - delayInt + count].comHeight + stepF2.traj[count].comHeight)
-			    -stepF1.traj[stepF1.size - 1].comHeight;
+		    t1.traj[t1.size - delayInt + count].comHeight =
+			    (t1.traj[t1.size - delayInt + count].comHeight + t2.traj[count].comHeight)
+			    -t1.traj[t1.size - 1].comHeight;
 
 		} else {
 
 		    instantFeatures instFt;
 		    
-		    instFt.comX = stepF2.traj[count].comX;
-		    instFt.zmpX = stepF2.traj[count].zmpX;
+		    instFt.comX = t2.traj[count].comX;
+		    instFt.zmpX = t2.traj[count].zmpX;
 		    
-		    instFt.comY = stepF2.traj[count].comY;
-		    instFt.zmpY = stepF2.traj[count].zmpY;
+		    instFt.comY = t2.traj[count].comY;
+		    instFt.zmpY = t2.traj[count].zmpY;
 		    
-		    instFt.leftfootX = stepF2.traj[count].leftfootX;
-		    instFt.leftfootY = stepF2.traj[count].leftfootY;
+		    instFt.leftfootX = t2.traj[count].leftfootX;
+		    instFt.leftfootY = t2.traj[count].leftfootY;
 		    
-		    instFt.leftfootOrient = stepF2.traj[count].leftfootOrient;
-		    instFt.leftfootHeight = stepF2.traj[count].leftfootHeight;
+		    instFt.leftfootOrient = t2.traj[count].leftfootOrient;
+		    instFt.leftfootHeight = t2.traj[count].leftfootHeight;
 		    
-		    instFt.rightfootX = stepF2.traj[count].rightfootX;
-		    instFt.rightfootY = stepF2.traj[count].rightfootY;
+		    instFt.rightfootX = t2.traj[count].rightfootX;
+		    instFt.rightfootY = t2.traj[count].rightfootY;
 		    
-		    instFt.rightfootOrient = stepF2.traj[count].rightfootOrient;
-		    instFt.rightfootHeight = stepF2.traj[count].rightfootHeight;
+		    instFt.rightfootOrient = t2.traj[count].rightfootOrient;
+		    instFt.rightfootHeight = t2.traj[count].rightfootHeight;
 		    
-		    instFt.waistOrient = stepF2.traj[count].waistOrient;
-		    instFt.comHeight = stepF2.traj[count].comHeight;
+		    instFt.waistOrient = t2.traj[count].waistOrient;
+		    instFt.comHeight = t2.traj[count].comHeight;
 		    
-		    stepF1.traj.push_back(instFt);
+		    t1.traj.push_back(instFt);
 		}
 
 	    }
 
-	    stepF1.size = stepF1.size + stepF2.size - delayInt;
+	    t1.size = t1.size + t2.size - delayInt;
+	    return t1.size - delayInt;
 	}
-	else if(stepF1.size == 0) {
-	    stepF1 = stepF2;    
+	else if(t1.size == 0) {
+	    t1 = t2;    
+	    return 0;
 	}
+	return 0;
 }
 
-void slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep) {
+int slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep) {
     addStepFeaturesWithSlide(t,downward_halfstep,0.0);    
 }
 
-void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep) {
+int slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep) {
     
     int ind = t.size-1;
     int startindex, endindex, prestartindex, postendindex;
@@ -209,14 +212,14 @@ void slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, float reduc
 	downward_halfstep.traj[i].rightfootY = MAX(reduction, MIN_PERCENT_REDUCTION)*(downward_halfstep.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
     }      
     
-    addStepFeaturesWithSlide(t,downward_halfstep, MAX(neg_time, bound_slide) );   
+    return addStepFeaturesWithSlide(t,downward_halfstep, MAX(neg_time, bound_slide) );   
 }
 
-void slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
-    addStepFeaturesWithSlide(t,upward_halfstep,0.0);        
+int slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
+    return addStepFeaturesWithSlide(t,upward_halfstep,0.0);        
 }
 
-void slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & upward_halfstep) {        
+int slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & upward_halfstep) {        
        
     int ind = t.size-1;
     int prestartindex, postendindex;
@@ -237,5 +240,5 @@ void slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, float reduc
     
     float bound_slide = MIN(-t.incrTime * (t.size - prestartindex) - t.incrTime * (postendindex) + MIN_DOUBLE_SUPPORT_TIME, 0.0);    
     
-    addStepFeaturesWithSlide(t,upward_halfstep, MAX(neg_time, bound_slide) );
+    return addStepFeaturesWithSlide(t,upward_halfstep, MAX(neg_time, bound_slide) );
 }

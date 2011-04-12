@@ -27,15 +27,15 @@ CnewSliderPG::~CnewSliderPG()
 
 }
 
-void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_input) {
+void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_input, float x_com_init, float y_com_init, float theta_supportfoot_init) { //at some point we will need also z_com_init
 
 	slidingClass slider;
-    
+	
 	SE2 config_curr;
 	SE2 config_prev;
-	config_curr.x = vect_input[0];
-	config_curr.y = vect_input[1];
-	config_curr.theta = 0.0;
+	config_curr.x = x_com_init + vect_input[0] * cos(theta_supportfoot_init) - vect_input[1] * sin(theta_supportfoot_init);
+	config_curr.y = y_com_init + vect_input[0] * sin(theta_supportfoot_init) + vect_input[1] * cos(theta_supportfoot_init);
+	config_curr.theta = theta_supportfoot_init;
 	
 	halfStepDefinition hsdef;
 	
@@ -49,13 +49,12 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 	hsdef.constants = constants;
 	
 	t.traj.clear();
-// 	t.contact_indexes.clear();
 	t.size = 0;
+	t.halfSteps_startindexes.clear();
 	
 	trajFeatures t_tmp;
 	t_tmp.incrTime = t.incrTime;
 	t_tmp.size = 0;
-// 	t_tmp.contact_indexes.clear();
 	
 	for(int i=2; i < (int) (vect_input.size()-6)/5+2 ; i++)
 	{       	  
@@ -64,7 +63,7 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 	    
 // 		cout << config_curr.x << " " << config_curr.y << " " << hsdef.pos_and_orient.x << " " << hsdef.pos_and_orient.y << endl;
 		generate_halfStepFeatures(t_tmp, config_curr, hsdef);		
-		slider.slideDownUpCOEF(t, coef_slide1, 1.0, t_tmp);		
+		t.halfSteps_startindexes.push_back( slider.slideDownUpCOEF(t, coef_slide1, 1.0, t_tmp) );
 		
 		hsdef.pos_and_orient.x = vect_input[5*i-2];
 		hsdef.pos_and_orient.y = vect_input[5*i-1];
@@ -73,7 +72,7 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 		
 // 		cout << config_curr.x << " " << config_curr.y << " " << hsdef.pos_and_orient.x << " " << hsdef.pos_and_orient.y << endl;
 		generate_halfStepFeatures(t_tmp, config_curr, hsdef);
-		slider.slideUpDownCOEF(t, coef_slide2, 1.0, t_tmp);
+		t.halfSteps_startindexes.push_back( slider.slideUpDownCOEF(t, coef_slide2, 1.0, t_tmp) );
 		
 		config_prev.x = config_curr.x; config_prev.y = config_curr.y; config_prev.theta = config_curr.theta;
 		config_curr.x += cos(config_prev.theta)*vect_input[5*i-2]-sin(config_prev.theta)*vect_input[5*i-1];
@@ -88,6 +87,10 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 		if(hsdef.support_foot == LEFT) hsdef.support_foot = RIGHT; else hsdef.support_foot = LEFT;
 	}
 	
+}
+
+void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_input) { 
+	produceTraj(t, vect_input, 0.0, 0.0, 0.0);
 }
 
 void CnewSliderPG::drawTraj(ofstream & fb, const trajFeatures & t, const vector<float> & vect_input)

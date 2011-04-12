@@ -42,7 +42,7 @@
 #define h_PER 0.70
 
 //Percentage of variation of the com height, relatively to the standard com height:
-#define COEF_VARIATION_COM_HEIGHT 0.02
+#define COEF_VARIATION_COM_HEIGHT 0.035
 
 #include "newSliderPG/halfStep_creation.h"
 
@@ -392,7 +392,11 @@ void construction_feet_UPWARD(trajFeatures & t, const SE2 & supportconfig, const
     float raiseTime = 0.0;
     if(def.support_foot == LEFT) {
 	for(unsigned int i = 0 ; i < t.size; i++) {
-	    if( abs(t.traj[i].zmpX - supportconfig.x) < radius && abs(t.traj[i].zmpY - supportconfig.y) < radius ) {    
+	    if( abs(t.traj[i].zmpX - supportconfig.x) < radius * 1.1 && abs(t.traj[i].zmpY - supportconfig.y) < radius * 1.1 ) {   
+		 //Just to try something, in the line above, we use radius * 1.1. This means that the foot can start to rise too early (when the zmp is still outside the support foot).
+		 //We hope that we can cope with this theoretical problem thanks to vertical variations
+		 //of the CoM.
+		 //TODO: verify that it works...
 		float time = ((float) i) * incrTime;
 		t.traj[i].rightfootHeight = val*A(B(r,(time - raiseTime)/(T - raiseTime)));
 	    } else {
@@ -402,7 +406,7 @@ void construction_feet_UPWARD(trajFeatures & t, const SE2 & supportconfig, const
 	}    
     } else {
 	for(unsigned int i = 0 ; i < t.size; i++) {
-	    if( abs(t.traj[i].zmpX - supportconfig.x) < radius && abs(t.traj[i].zmpY - supportconfig.y) < radius ) {  
+	    if( abs(t.traj[i].zmpX - supportconfig.x) < radius * 1.1 && abs(t.traj[i].zmpY - supportconfig.y) < radius * 1.1 ) {  
 		float time = ((float) i) * incrTime;
 		t.traj[i].leftfootHeight = val*A(B(r,(time - raiseTime)/(T - raiseTime)));
 	    } else {
@@ -556,13 +560,16 @@ void construction_feet_DOWNWARD(trajFeatures & t, const SE2 & supportconfig, con
     time_zmp_out = current_tzo;    
     
     //Just to try something:
-    //it puts the moment when the foot lands on the ground a bit later.
+    //we put the moment when the foot lands on the ground a bit later.
     //Theoretically, it's not very good since the zmp might already be outside the 
     //polygon of support, but it corresponds to the moment when the humans 
     //start to rotate around the tip of the foot (using the toes) with the support foot.
     //Therefore, this modification can be used to obtain a more "human" walk,
     //and besides, singularities become less likely to occur, so the steps can 
     //be larger.
+    //We hope that we can cope with this theoretical problem thanks to vertical variations
+    //of the CoM.
+    //TODO: verify that it works...
     time_zmp_out = MIN(current_tzo + 0.5, def.constants.t_total);
           
     float T = time_zmp_out;
