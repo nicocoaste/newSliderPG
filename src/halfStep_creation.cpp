@@ -392,8 +392,8 @@ void construction_feet_UPWARD(trajFeatures & t, const SE2 & supportconfig, const
     float raiseTime = 0.0;
     if(def.support_foot == LEFT) {
 	for(unsigned int i = 0 ; i < t.size; i++) {
-	    if( abs(t.traj[i].zmpX - supportconfig.x) < radius * 1.1 && abs(t.traj[i].zmpY - supportconfig.y) < radius * 1.1 ) {   
-		 //Just to try something, in the line above, we use radius * 1.1. This means that the foot can start to rise too early (when the zmp is still outside the support foot).
+	    if( abs(t.traj[i].zmpX - supportconfig.x) < radius * 1.01 && abs(t.traj[i].zmpY - supportconfig.y) < radius * 1.01 ) {   
+		 //Just to try something, in the line above, we use radius * 1.01 ( > radius). This means that the foot can start to rise too early (when the zmp is still outside the support foot).
 		 //We hope that we can cope with this theoretical problem thanks to vertical variations
 		 //of the CoM.
 		 //TODO: verify that it works...
@@ -406,7 +406,7 @@ void construction_feet_UPWARD(trajFeatures & t, const SE2 & supportconfig, const
 	}    
     } else {
 	for(unsigned int i = 0 ; i < t.size; i++) {
-	    if( abs(t.traj[i].zmpX - supportconfig.x) < radius * 1.1 && abs(t.traj[i].zmpY - supportconfig.y) < radius * 1.1 ) {  
+	    if( abs(t.traj[i].zmpX - supportconfig.x) < radius * 1.01 && abs(t.traj[i].zmpY - supportconfig.y) < radius * 1.01 ) {  
 		float time = ((float) i) * incrTime;
 		t.traj[i].leftfootHeight = val*A(B(r,(time - raiseTime)/(T - raiseTime)));
 	    } else {
@@ -570,7 +570,7 @@ void construction_feet_DOWNWARD(trajFeatures & t, const SE2 & supportconfig, con
     //We hope that we can cope with this theoretical problem thanks to vertical variations
     //of the CoM.
     //TODO: verify that it works...
-    time_zmp_out = MIN(current_tzo + 0.5, def.constants.t_total);
+    time_zmp_out = MIN(current_tzo + 0.4, def.constants.t_total);
           
     float T = time_zmp_out;
     float val = -def.vp_config.maxHeight;
