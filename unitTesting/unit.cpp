@@ -12,6 +12,17 @@
 #include <vector>
 #include <string>
 
+class Cslide : public slidingClass
+{
+    public:
+	Cslide() {}
+
+	~Cslide() {}
+	
+	bool isValid(instantFeatures & i) {
+	    return true;  
+	}
+};
 
 int main (int argc, char *argv[]) {
 
@@ -23,7 +34,8 @@ int main (int argc, char *argv[]) {
 
   CnewSliderPG * NSPG;
  
-  NSPG = new CnewSliderPG(); 
+  Cslide * S = new Cslide();
+  NSPG = new CnewSliderPG(S); 
   
   float body_height;
   char left_or_right;

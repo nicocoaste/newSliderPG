@@ -35,13 +35,14 @@ class CnewSliderPG
 		/*!
 		 * Constructor.
 		 */
-		CnewSliderPG();
+		CnewSliderPG(slidingClass * slidingObject);
 
 		/*!
 		 * Destructor.
 		 */
 		~CnewSliderPG();
 		
+		slidingClass * slider;
 		void set_incrTime(float itime) {incrTime = itime;}
 		void set_first_support_foot(LoR fsf) {first_support_foot = fsf;}
 		void set_vp_config(const viaPointConfig & vpc) {vp_config = vpc;}

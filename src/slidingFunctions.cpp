@@ -13,7 +13,13 @@
 
 //The minimum coefficient for the trajectory smoothing (for example, with 1.0 the 
 //trajectory is not modified, and for 0.0 the feet height will always be 0):
-#define MIN_PERCENT_REDUCTION 0.1
+#define MIN_PERCENT_REDUCTION 0.25
+
+//The precision of time search during the dichotomy (in s):
+#define T_STOP_DICHO 0.001
+
+//The precision of the reduction percentage during the dichotomy:
+#define P_STOP_DICHO 0.001
 
 #ifndef PI
 # define PI 3.14159265359
@@ -39,7 +45,7 @@ slidingClass::~slidingClass()
 
 int addStepFeaturesWithSlide(
 	trajFeatures & t1,
-	trajFeatures & t2,
+	const trajFeatures & t2,
 	float negativeSlideTime
 	) 
 {
@@ -144,20 +150,12 @@ int addStepFeaturesWithSlide(
 	return 0;
 }
 
-int slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep) {
-    addStepFeaturesWithSlide(t,downward_halfstep,0.0);    
-}
 
-int slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep) {
-    
+
+void findUpDownindexes(const trajFeatures & t, const trajFeatures & downward_halfstep, int & prestartindex, int & startindex, int & endindex, int & postendindex) {
+       
     int ind = t.size-1;
-    int startindex, endindex, prestartindex, postendindex;
-    float leftXstart, rightXstart, leftYstart, rightYstart;
-    float leftXfinal, rightXfinal, leftYfinal, rightYfinal;
     while(t.traj[ind].rightfootHeight > 0.0000001 || t.traj[ind].leftfootHeight > 0.0000001) {
-	t.traj[ind].rightfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
-	t.traj[ind].leftfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
-	
 	if(t.traj[ind].rightfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT || t.traj[ind].leftfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT) 
 	    startindex = ind;
 	
@@ -165,16 +163,30 @@ int slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, float reduct
 	ind--;
     }
     ind = 0;
-    while(downward_halfstep.traj[ind].rightfootHeight > 0.0000001 || downward_halfstep.traj[ind].leftfootHeight > 0.0000001) {	
-	downward_halfstep.traj[ind].rightfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
-	downward_halfstep.traj[ind].leftfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
+    while(downward_halfstep.traj[ind].rightfootHeight > 0.0000001 || downward_halfstep.traj[ind].leftfootHeight > 0.0000001) {
 	
 	if(downward_halfstep.traj[ind].rightfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT || downward_halfstep.traj[ind].leftfootHeight > MIN_FOOT_HEIGHT_FOR_HORIZONTAL_DISPLACEMENT)
 	    endindex = ind;
 	
 	postendindex = ind;
 	ind++;
-    }   
+    }
+    
+}
+
+int slideUpDownCOEF_withindexes(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep, const int & prestartindex, const int & startindex, const int & endindex, const int & postendindex) {    
+
+    float leftXstart, rightXstart, leftYstart, rightYstart;
+    float leftXfinal, rightXfinal, leftYfinal, rightYfinal;
+    
+    for(int i = prestartindex; i < (int) t.size; i++) {
+	t.traj[i].rightfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
+	t.traj[i].leftfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
+    }
+    for(int i = 0; i <= postendindex; i++) {
+	downward_halfstep.traj[i].rightfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
+	downward_halfstep.traj[i].leftfootHeight *= MAX(reduction, MIN_PERCENT_REDUCTION);
+    }    
     
     float bound_slide = -t.incrTime * (t.size - startindex);
     
@@ -212,17 +224,111 @@ int slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, float reduct
 	downward_halfstep.traj[i].rightfootY = MAX(reduction, MIN_PERCENT_REDUCTION)*(downward_halfstep.traj[i].rightfootY - tmp_rightY) + tmp_rightY;
     }      
     
-    return addStepFeaturesWithSlide(t,downward_halfstep, MAX(neg_time, bound_slide) );   
+    return addStepFeaturesWithSlide(t,downward_halfstep, MAX(neg_time, bound_slide) ); 
+        
 }
 
-int slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
-    return addStepFeaturesWithSlide(t,upward_halfstep,0.0);        
+int slidingClass::slideUpDownCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep) {
+      
+    int prestartindex, startindex, endindex, postendindex;
+    findUpDownindexes(t, downward_halfstep, prestartindex, startindex, endindex, postendindex);
+    return slideUpDownCOEF_withindexes(t, neg_time, reduction, downward_halfstep, prestartindex, startindex, endindex, postendindex);
+    
 }
 
-int slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & upward_halfstep) {        
-       
+bool slidingClass::check_slideUpDown(
+	const trajFeatures & t1,
+	float neg_time, 
+	float reduction,
+	const trajFeatures & t2,
+	const int & prestartindex,
+	const int & startindex,
+	const int & endindex,
+	const int & postendindex) {
+    
+    if(t1.size != 0 && t2.size != 0) {
+	    
+	    unsigned int delayInt = t1.size - prestartindex;
+
+	    trajFeatures t1bis;
+	    t1bis.traj.resize(delayInt);
+	    for(unsigned int i = 0; i < delayInt; i++) {
+		t1bis.traj[i] = t1.traj[t1.size - delayInt + i];
+	    }
+	    t1bis.incrTime = t1.incrTime;
+	    t1bis.size = delayInt;
+	    
+	    trajFeatures t2bis;
+	    t2bis.traj.resize(t2.size);
+	    for(unsigned int i = 0; i < t2.size; i++) {
+		t2bis.traj[i] = t2.traj[i];
+	    }
+	    t2bis.incrTime = t2.incrTime;
+	    t2bis.size = t2.size;
+	    
+	    slideUpDownCOEF_withindexes(t1bis, neg_time, reduction, t2bis, 0, startindex - prestartindex, endindex, postendindex);
+	    
+	    for(unsigned int i = 0; i < t1bis.size; i++) {    
+		if(!isValid(t1bis.traj[i])) {
+		    return false;
+		}
+	    }
+    }    
+    return true;    
+}
+
+int slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep) {
+    
+    int prestartindex, startindex, endindex, postendindex;
+    findUpDownindexes(t, downward_halfstep, prestartindex, startindex, endindex, postendindex);
+
+    float bound_slide = -t.incrTime * (t.size - startindex);
+            
+    float max_reduction_coef = 1.0;
+    float min_reduction_coef = MIN_PERCENT_REDUCTION;
+    float current_reduction_coef = MIN_PERCENT_REDUCTION;
+    
+    float max_neg_time = 0.0;
+    float min_neg_time = bound_slide;
+    float current_neg_time = bound_slide;
+    
+    while(max_neg_time - min_neg_time > T_STOP_DICHO) 
+    {	
+	bool yn = check_slideUpDown(t, current_neg_time, 1.0, downward_halfstep, prestartindex, startindex, endindex, postendindex);
+	
+	if(yn) {
+	    max_neg_time = current_neg_time;
+	    current_neg_time = (max_neg_time + min_neg_time)/2.0;
+	}
+	else {
+	    min_neg_time = current_neg_time;
+	    current_neg_time = (max_neg_time + min_neg_time)/2.0;
+	}
+    }    
+    
+    while(max_reduction_coef - min_reduction_coef > P_STOP_DICHO) 
+    {
+	bool yn = check_slideUpDown(t, current_neg_time, current_reduction_coef, downward_halfstep, prestartindex, startindex, endindex, postendindex);
+	
+	if(yn) {
+	    max_reduction_coef = current_reduction_coef;
+	    current_reduction_coef = (max_reduction_coef + min_reduction_coef)/2.0;
+	}
+	else {
+	    min_reduction_coef = current_reduction_coef;
+	    current_reduction_coef = (max_reduction_coef + min_reduction_coef)/2.0;
+	}
+    }    
+    
+    return slideUpDownCOEF(t, current_neg_time, current_reduction_coef, downward_halfstep);    
+}
+
+
+
+
+void findDownUpindexes(const trajFeatures & t, const trajFeatures & upward_halfstep, int & prestartindex, int & postendindex) {
+    
     int ind = t.size-1;
-    int prestartindex, postendindex;
     if(t.size != 0) {
 	while(t.traj[ind].rightfootHeight < 0.0000001 && t.traj[ind].leftfootHeight < 0.0000001) {
 	    prestartindex = ind;
@@ -236,9 +342,74 @@ int slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, float reduct
     while(upward_halfstep.traj[ind].rightfootHeight < 0.0000001 && upward_halfstep.traj[ind].leftfootHeight < 0.0000001) {	
 	postendindex = ind;
 	ind++;
-    }  
+    } 
     
+}
+
+int slideDownUpCOEF_withindexes(trajFeatures & t, float neg_time, const trajFeatures & upward_halfstep, const int & prestartindex, const int & postendindex) {    
+
     float bound_slide = MIN(-t.incrTime * (t.size - prestartindex) - t.incrTime * (postendindex) + MIN_DOUBLE_SUPPORT_TIME, 0.0);    
-    
     return addStepFeaturesWithSlide(t,upward_halfstep, MAX(neg_time, bound_slide) );
+    
+}
+    
+int slidingClass::slideDownUpCOEF(trajFeatures & t, float neg_time, const trajFeatures & upward_halfstep) {        
+       
+    int prestartindex, postendindex;
+    findDownUpindexes(t, upward_halfstep, prestartindex, postendindex);
+    return slideDownUpCOEF_withindexes(t, neg_time, upward_halfstep, prestartindex, postendindex);
+}
+
+bool slidingClass::check_slideDownUp(
+	const trajFeatures & t1,
+	float neg_time, 
+	const trajFeatures & t2) {
+    
+    if(t1.size != 0 && t2.size != 0) {
+	    
+	    unsigned int delayInt = (int) (abs(neg_time)/t2.incrTime);
+
+	    trajFeatures t1bis;
+	    t1bis.traj.resize(delayInt);
+	    for(unsigned int i = 0; i < delayInt; i++) {
+		t1bis.traj[i] = t1.traj[t1.size - delayInt + i];
+	    }
+	    t1bis.incrTime = t1.incrTime;
+	    t1bis.size = delayInt;
+	    
+	    slideDownUpCOEF(t1bis, neg_time, t2);
+	    
+	    for(unsigned int i = 0; i < t1bis.size; i++) {
+		if(!isValid(t1bis.traj[i])) return false;
+	    }
+    }    
+    return true;    
+}
+
+int slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
+    
+    int prestartindex, postendindex;
+    findDownUpindexes(t, upward_halfstep, prestartindex, postendindex);
+    
+    float bound_slide = MIN(-t.incrTime * (t.size - prestartindex) - t.incrTime * (postendindex) + MIN_DOUBLE_SUPPORT_TIME, 0.0);
+    
+    float max_neg_time = 0.0;
+    float min_neg_time = bound_slide;
+    float current_neg_time = bound_slide;
+    
+    while(max_neg_time - min_neg_time > T_STOP_DICHO) 
+    {
+	bool yn = check_slideDownUp(t, current_neg_time, upward_halfstep);
+	
+	if(yn) {
+	    max_neg_time = current_neg_time;
+	    current_neg_time = (max_neg_time + min_neg_time)/2.0;
+	}
+	else {
+	    min_neg_time = current_neg_time;
+	    current_neg_time = (max_neg_time + min_neg_time)/2.0;
+	}
+    }    
+    
+    return slideDownUpCOEF(t, current_neg_time, upward_halfstep);        
 }

@@ -31,10 +31,10 @@ using namespace std;
  * description by an instantFeatures object. 
  * Must be implemented by the user.
  */
-class CheckValidity {
-    public:
-	virtual bool isValid(instantFeatures & i) { return true; }
-};
+// class CheckValidity {
+//     public:
+// 	virtual bool isValid(instantFeatures & i) { return true; }
+// };
 
 class slidingClass {
     public:
@@ -46,6 +46,8 @@ class slidingClass {
 	 * Destructor.
 	*/
 	~slidingClass();
+	
+	virtual bool isValid(instantFeatures & i) { return true; }
 	
 	/*!
 	* A function that takes in input an object trajFeatures corresponding to a sequence of
@@ -76,14 +78,19 @@ class slidingClass {
 	/*!
 	 * Similar to slideDownUpMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
 	 */
-	int slideDownUpCOEF(trajFeatures & t, float neg_time, float reduction, trajFeatures & downward_halfstep);
-	
-    private:
+	int slideDownUpCOEF(trajFeatures & t, float neg_time, const trajFeatures & upward_halfstep);
 	/*!
 	 * The object used to check the validity of configurations. It might for 
 	 * example include self-collision checks.
 	 */
-	CheckValidity validator;
+// 	CheckValidity validator;
+	
+    private:
+	
+	bool check_slideUpDown(const trajFeatures & t1,float neg_time,float reduction,const trajFeatures & t2,
+	    const int & prestartindex,const int & startindex,const int & endindex,const int & postendindex);
+	bool check_slideDownUp(const trajFeatures & t1,float neg_time,const trajFeatures & t2);
+
 };
 
 #endif

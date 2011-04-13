@@ -17,20 +17,18 @@
 
 using namespace std;
 
-CnewSliderPG::CnewSliderPG()
+CnewSliderPG::CnewSliderPG(slidingClass * slidingObject)
 {
-
+    slider = slidingObject;
 }
 
 CnewSliderPG::~CnewSliderPG()
 {
-
+    delete slider;
 }
 
 void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_input, float x_com_init, float y_com_init, float theta_supportfoot_init) { //at some point we will need also z_com_init
 
-	slidingClass slider;
-	
 	SE2 config_curr;
 	SE2 config_prev;
 	config_curr.x = x_com_init + vect_input[0] * cos(theta_supportfoot_init) - vect_input[1] * sin(theta_supportfoot_init);
@@ -62,8 +60,9 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 		float coef_slide2 = vect_input[5*i-3];
 	    
 // 		cout << config_curr.x << " " << config_curr.y << " " << hsdef.pos_and_orient.x << " " << hsdef.pos_and_orient.y << endl;
-		generate_halfStepFeatures(t_tmp, config_curr, hsdef);		
-		t.halfSteps_startindexes.push_back( slider.slideDownUpCOEF(t, coef_slide1, 1.0, t_tmp) );
+		generate_halfStepFeatures(t_tmp, config_curr, hsdef);
+// 		t.halfSteps_startindexes.push_back( slider->slideDownUpCOEF(t, coef_slide1, t_tmp) );
+		t.halfSteps_startindexes.push_back( slider->slideDownUpMAX(t, t_tmp) );
 		
 		hsdef.pos_and_orient.x = vect_input[5*i-2];
 		hsdef.pos_and_orient.y = vect_input[5*i-1];
@@ -72,7 +71,8 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 		
 // 		cout << config_curr.x << " " << config_curr.y << " " << hsdef.pos_and_orient.x << " " << hsdef.pos_and_orient.y << endl;
 		generate_halfStepFeatures(t_tmp, config_curr, hsdef);
-		t.halfSteps_startindexes.push_back( slider.slideUpDownCOEF(t, coef_slide2, 1.0, t_tmp) );
+// 		t.halfSteps_startindexes.push_back( slider->slideUpDownCOEF(t, coef_slide2, 0.3, t_tmp) );
+		t.halfSteps_startindexes.push_back( slider->slideUpDownMAX(t, t_tmp) );
 		
 		config_prev.x = config_curr.x; config_prev.y = config_curr.y; config_prev.theta = config_curr.theta;
 		config_curr.x += cos(config_prev.theta)*vect_input[5*i-2]-sin(config_prev.theta)*vect_input[5*i-1];
