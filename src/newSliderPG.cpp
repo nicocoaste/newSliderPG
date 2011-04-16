@@ -54,6 +54,18 @@ CnewSliderPG::~CnewSliderPG()
     delete slider;
 }
 
+void CnewSliderPG::addHalfStep(trajFeatures & t, SE2 & config_curr_supportfoot, halfStepDefinition & hsdef) {    
+    trajFeatures t_tmp;
+    t_tmp.incrTime = t.incrTime;
+    t_tmp.size = 0;
+    generate_halfStepFeatures(t_tmp, config_curr_supportfoot, hsdef);
+    if(hsdef.half_step_type == UP) {
+	t.halfSteps_startindexes.push_back( slider->slideDownUpMAX(t, t_tmp));
+    } else {
+	t.halfSteps_startindexes.push_back( slider->slideUpDownMAX(t, t_tmp));
+    }   
+}
+
 void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_input, float x_com_init, float y_com_init, float theta_supportfoot_init) { //at some point we will need also z_com_init
 
 	SE2 config_curr;

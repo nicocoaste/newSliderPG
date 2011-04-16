@@ -53,7 +53,8 @@
 // v_80:     2.962078
 // v_75:     3.146264
 // #define r_PARAM 1.347141
-#define r_PARAM 1.692279
+// #define r_PARAM 1.692279
+#define r_PARAM 1.015179
 
 //before using the quickly shifting zmp curve, we introduce a discrepancy between the 
 //com position and the zmp position. Thanks to that, the initial speed required for

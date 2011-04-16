@@ -151,6 +151,11 @@ class CnewSliderPG
 		 */
 		void produceTraj(trajFeatures & t, const vector<float> & vect_input, float x_com_init, float y_com_init, float theta_supportfoot_init);
 		
+		/*!
+		 * Just add one half-step to the trajFeatures object t:
+		 */
+		void addHalfStep(trajFeatures & t, SE2 & config_curr_supportfoot, halfStepDefinition & hsdef);
+		
 		/*! drawSteps outputs a file intended for gnuplot.
 		 * Let's say that the result of drawSteps is in the 
 		 * file "data.gnuplot".
