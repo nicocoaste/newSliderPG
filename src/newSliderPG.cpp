@@ -66,6 +66,44 @@ void CnewSliderPG::addHalfStep(trajFeatures & t, SE2 & config_curr_supportfoot, 
     }   
 }
 
+void CnewSliderPG::addHalfStep(vector<HalfStep> & v, trajFeatures & t, SE2 & config_curr_supportfoot, halfStepDefinition & hsdef) {    
+    trajFeatures t_tmp;
+    t_tmp.incrTime = t.incrTime;
+    t_tmp.size = 0;
+    generate_halfStepFeatures(t_tmp, config_curr_supportfoot, hsdef);
+    if(hsdef.half_step_type == UP) {
+	HalfStep HS;
+	HS.definition = hsdef;
+	HS.support_foot_config = config_curr_supportfoot;
+	HS.trajFeats = t_tmp;
+	
+	int index_return;
+	float negative_overlap;
+	slider->slideDownUpMAX(t, t_tmp, index_return, negative_overlap);
+	t.halfSteps_startindexes.push_back( index_return );
+	
+	HS.negative_overlap = negative_overlap;
+	
+	v.push_back(HS);
+    } else {
+	HalfStep HS;
+	HS.definition = hsdef;
+	HS.support_foot_config = config_curr_supportfoot;
+	HS.trajFeats = t_tmp;
+	
+	int index_return;
+	float negative_overlap, reduction_coef;
+	slider->slideUpDownMAX(t, t_tmp, index_return, negative_overlap, reduction_coef);
+	t.halfSteps_startindexes.push_back( index_return );
+	v[v.size()-1].reduction_coef = reduction_coef;
+
+	HS.negative_overlap = negative_overlap;
+	HS.reduction_coef = reduction_coef;
+	
+	v.push_back(HS);
+    }   
+}
+
 void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_input, float x_com_init, float y_com_init, float theta_supportfoot_init) { //at some point we will need also z_com_init
 
 	SE2 config_curr;
@@ -95,8 +133,8 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 	
 	for(int i=2; i < (int) (vect_input.size()-6)/5+2 ; i++)
 	{       	  
-		float coef_slide1 = vect_input[5*i-4];
-		float coef_slide2 = vect_input[5*i-3];
+// 		float coef_slide1 = vect_input[5*i-4];
+// 		float coef_slide2 = vect_input[5*i-3];
 	    
 // 		cout << config_curr.x << " " << config_curr.y << " " << hsdef.pos_and_orient.x << " " << hsdef.pos_and_orient.y << endl;
 		generate_halfStepFeatures(t_tmp, config_curr, hsdef);

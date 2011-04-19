@@ -159,6 +159,22 @@ struct halfStepDefinition {
     hsConstants constants;
 };
 
+
+/*!
+ * This is the structure that sums up everything for a half-step. 
+ * It contains the half-step definition, the trajectory features associated,
+ * the reduction coefficient (for the swing foot height), the negative overlap
+ * (i.e. the negative time used to "slide" this half-step over the previous 
+ * half-step), and the configuration of the support foot.
+ */
+struct HalfStep {
+    halfStepDefinition definition;
+    SE2 support_foot_config; 
+    trajFeatures trajFeats;
+    float negative_overlap;
+    float reduction_coef;               
+};
+
 /*!
  * A function belonging to no class that takes in input the 
  * position and orientation of the CENTER OF THE support foot in the global

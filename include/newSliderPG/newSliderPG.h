@@ -73,6 +73,12 @@ class CnewSliderPG
 		void set_ft_dim(const feetDimensions & ftd) {ft_dim = ftd;}
 		void set_constants(const hsConstants & csts) {constants = csts;}
 		
+		void get_incrTime() {return incrTime;}
+		void get_first_support_foot() {return first_support_foot;}
+		void get_vp_config() {return vp_config;}
+		void get_ft_dim() {return ft_dim;}
+		void get_constants() {return constants;}
+		
 		/*!
 		 * produceTraj generates the trajectories of the end-effectors of
 		 * the robot lower body, for a sequence of steps defined by vect_input.
@@ -155,6 +161,7 @@ class CnewSliderPG
 		 * Just add one half-step to the trajFeatures object t:
 		 */
 		void addHalfStep(trajFeatures & t, SE2 & config_curr_supportfoot, halfStepDefinition & hsdef);
+		void addHalfStep(vector<HalfStep> & v, trajFeatures & t, SE2 & config_curr_supportfoot, halfStepDefinition & hsdef);
 		
 		/*! drawSteps outputs a file intended for gnuplot.
 		 * Let's say that the result of drawSteps is in the 

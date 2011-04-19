@@ -304,7 +304,7 @@ bool slidingClass::check_slideUpDown(
     return true;    
 }
 
-int slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep) {
+void slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep, int & index_return, float & negative_overlap, float & reduction_coef) {
     
     int prestartindex, startindex, endindex, postendindex;
     findUpDownindexes(t, downward_halfstep, prestartindex, startindex, endindex, postendindex);
@@ -322,7 +322,7 @@ int slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfs
     bool altern = true;
     
     while(max_neg_time - min_neg_time > T_STOP_DICHO || max_reduction_coef - min_reduction_coef > P_STOP_DICHO) 
-    {	
+    {
 	bool yn = check_slideUpDown(t, current_neg_time, current_reduction_coef, downward_halfstep, prestartindex, startindex, endindex, postendindex);
 	
 	if(yn && altern) {
@@ -345,27 +345,20 @@ int slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfs
 	    current_reduction_coef = (max_reduction_coef + min_reduction_coef)/2.0;
 	    altern = !altern;
 	}
-    }    
+    }       
     
-/*    while(max_reduction_coef - min_reduction_coef > P_STOP_DICHO) 
-    {
-	bool yn = check_slideUpDown(t, current_neg_time, current_reduction_coef, downward_halfstep, prestartindex, startindex, endindex, postendindex);
-	
-	if(yn) {
-	    max_reduction_coef = current_reduction_coef;
-	    current_reduction_coef = (max_reduction_coef + min_reduction_coef)/2.0;
-	}
-	else {
-	    min_reduction_coef = current_reduction_coef;
-	    current_reduction_coef = (max_reduction_coef + min_reduction_coef)/2.0;
-	}
-    }*/    
-    
-    return slideUpDownCOEF(t, current_neg_time, current_reduction_coef, downward_halfstep);    
+    index_return = slideUpDownCOEF(t, current_neg_time, current_reduction_coef, downward_halfstep);    
+    negative_overlap = current_neg_time;
+    reduction_coef = current_reduction_coef;
 }
 
-
-
+int slidingClass::slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep) {
+    
+    int index_return;
+    float reduction_coef, negative_overlap;
+    slideUpDownMAX(t, downward_halfstep, index_return, negative_overlap, reduction_coef);
+    return index_return;
+}
 
 void findDownUpindexes(const trajFeatures & t, const trajFeatures & upward_halfstep, int & prestartindex, int & postendindex) {
     
@@ -427,7 +420,7 @@ bool slidingClass::check_slideDownUp(
     return true;    
 }
 
-int slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
+void slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep, int & index_return, float & negative_overlap) {
     
     int prestartindex, postendindex;
     findDownUpindexes(t, upward_halfstep, prestartindex, postendindex);
@@ -452,5 +445,14 @@ int slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfste
 	}
     }    
     
-    return slideDownUpCOEF(t, current_neg_time, upward_halfstep);        
+    index_return = slideDownUpCOEF(t, current_neg_time, upward_halfstep);
+    negative_overlap = current_neg_time;
+}
+
+int slidingClass::slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep) {
+    
+    int index_return;
+    float negative_overlap;
+    slideDownUpMAX(t, upward_halfstep, index_return, negative_overlap);
+    return index_return;
 }

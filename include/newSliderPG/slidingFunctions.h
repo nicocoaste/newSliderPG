@@ -82,6 +82,7 @@ class slidingClass {
 	* The integer returned is the index in t when the new half-step will start.
 	*/
 	int slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep);
+	void slideUpDownMAX(trajFeatures & t, trajFeatures & downward_halfstep, int & index_return, float & negative_overlap, float & reduction_coef);
 	
 	/*!
 	 * Similar to slideUpDownMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
@@ -98,6 +99,7 @@ class slidingClass {
 	* The integer returned is the index in t when the new half-step will start.
 	*/
 	int slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep);
+	void slideDownUpMAX(trajFeatures & t, trajFeatures & upward_halfstep, int & index_return, float & negative_overlap);
 	
 	/*!
 	 * Similar to slideDownUpMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
