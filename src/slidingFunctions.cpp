@@ -40,7 +40,7 @@
 
 //The minimum coefficient for the trajectory smoothing (for example, with 1.0 the 
 //trajectory is not modified, and for 0.0 the feet height will always be 0):
-#define MIN_PERCENT_REDUCTION 0.30
+#define MIN_PERCENT_REDUCTION 0.50
 
 //The precision of time search during the dichotomy (in s):
 #define T_STOP_DICHO 0.05

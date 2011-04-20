@@ -73,11 +73,11 @@ class CnewSliderPG
 		void set_ft_dim(const feetDimensions & ftd) {ft_dim = ftd;}
 		void set_constants(const hsConstants & csts) {constants = csts;}
 		
-		void get_incrTime() {return incrTime;}
-		void get_first_support_foot() {return first_support_foot;}
-		void get_vp_config() {return vp_config;}
-		void get_ft_dim() {return ft_dim;}
-		void get_constants() {return constants;}
+		float get_incrTime() {return incrTime;}
+		LoR get_first_support_foot() {return first_support_foot;}
+		viaPointConfig get_vp_config() {return vp_config;}
+		feetDimensions get_ft_dim() {return ft_dim;}
+		hsConstants get_constants() {return constants;}
 		
 		/*!
 		 * produceTraj generates the trajectories of the end-effectors of
