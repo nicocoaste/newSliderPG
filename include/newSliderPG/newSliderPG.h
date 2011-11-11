@@ -184,6 +184,16 @@ class CnewSliderPG
 		 *                   because the footprints are drawn.
 		 */
 		void drawTraj(ofstream & fb, const trajFeatures & t, const vector<float> & vect_input);
+
+		/*!
+		 * Function to plot the left foot height in function of the x-axis position of the foot.
+		 */
+		void plot_feet_z_in_function_of_x(ofstream & fb, const trajFeatures & t);
+
+		/*!
+		 * Function to plot the left foot height in function of the y-axis position of the foot.
+		 */
+		void plot_feet_z_in_function_of_y(ofstream & fb, const trajFeatures & t);
 		
 		/*!
 		 * Function to plot only the CoM and ZMP trajectories along the x axis.

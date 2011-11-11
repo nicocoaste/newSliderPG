@@ -363,6 +363,76 @@ void CnewSliderPG::drawTraj(ofstream & fb, const trajFeatures & t, const vector<
 	fb << endl;
 }
 
+void CnewSliderPG::plot_feet_z_in_function_of_x(ofstream & fb, const trajFeatures & t) {
+    
+	for(unsigned int i=0; i < t.size-1 ; i++)
+	{
+		fb << t.traj[i].leftfootX
+			<< " " << t.traj[i].leftfootHeight
+			<< " " << t.traj[i+1].leftfootX
+			<< " " << t.traj[i+1].leftfootHeight
+			<< endl;
+		fb << t.traj[i+1].leftfootX
+			<< " " << t.traj[i+1].leftfootHeight
+			<< " " << t.traj[i+1].leftfootX
+			<< " " << t.traj[i+1].leftfootHeight
+			<< endl << endl;
+	}
+	fb << endl;    
+	//After 3 endl, new index in gnuplot.
+
+	for(unsigned int i=0; i < t.size-1 ; i++)
+	{
+		fb << t.traj[i].rightfootX
+			<< " " << t.traj[i].rightfootHeight
+			<< " " << t.traj[i+1].rightfootX
+			<< " " << t.traj[i+1].rightfootHeight
+			<< endl;
+		fb << t.traj[i+1].rightfootX
+			<< " " << t.traj[i+1].rightfootHeight
+			<< " " << t.traj[i+1].rightfootX
+			<< " " << t.traj[i+1].rightfootHeight
+			<< endl << endl;
+	}
+	fb << endl; 
+	
+}
+
+void CnewSliderPG::plot_feet_z_in_function_of_y(ofstream & fb, const trajFeatures & t) {
+    
+	for(unsigned int i=0; i < t.size-1 ; i++)
+	{
+		fb << t.traj[i].leftfootY
+			<< " " << t.traj[i].leftfootHeight
+			<< " " << t.traj[i+1].leftfootY
+			<< " " << t.traj[i+1].leftfootHeight
+			<< endl;
+		fb << t.traj[i+1].leftfootY
+			<< " " << t.traj[i+1].leftfootHeight
+			<< " " << t.traj[i+1].leftfootY
+			<< " " << t.traj[i+1].leftfootHeight
+			<< endl << endl;
+	}
+	fb << endl;    
+	//After 3 endl, new index in gnuplot.
+
+	for(unsigned int i=0; i < t.size-1 ; i++)
+	{
+		fb << t.traj[i].rightfootY
+			<< " " << t.traj[i].rightfootHeight
+			<< " " << t.traj[i+1].rightfootY
+			<< " " << t.traj[i+1].rightfootHeight
+			<< endl;
+		fb << t.traj[i+1].rightfootY
+			<< " " << t.traj[i+1].rightfootHeight
+			<< " " << t.traj[i+1].rightfootY
+			<< " " << t.traj[i+1].rightfootHeight
+			<< endl << endl;
+	}
+	fb << endl; 
+	
+}
+
 void  CnewSliderPG::plot_com_zmp_along_x(ofstream & fb, const trajFeatures & t) {
 	
 	for(unsigned int i=0; i < t.size-1 ; i++)
