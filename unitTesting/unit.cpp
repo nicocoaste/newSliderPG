@@ -52,7 +52,7 @@ class Cslide : public slidingClass
 int main (int argc, char *argv[]) {
 
   filebuf fb;
-  fb.open (argv[1],ios::in);
+  fb.open (argv[1],ios::in); //opens the file that describes the sequence of steps
   istream is(&fb);
 	
   string bufstring;

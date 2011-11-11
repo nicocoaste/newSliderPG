@@ -132,13 +132,13 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 	t_tmp.size = 0;
 	
 	for(int i=2; i < (int) (vect_input.size()-6)/5+2 ; i++)
-	{       	  
+	{       
 // 		float coef_slide1 = vect_input[5*i-4];
 // 		float coef_slide2 = vect_input[5*i-3];
 	    
 // 		cout << config_curr.x << " " << config_curr.y << " " << hsdef.pos_and_orient.x << " " << hsdef.pos_and_orient.y << endl;
 		generate_halfStepFeatures(t_tmp, config_curr, hsdef);
-// 		t.halfSteps_startindexes.push_back( slider->slideDownUpCOEF(t, coef_slide1, t_tmp) );
+		// 		t.halfSteps_startindexes.push_back( slider->slideDownUpCOEF(t, coef_slide1, t_tmp) );
 		t.halfSteps_startindexes.push_back( slider->slideDownUpMAX(t, t_tmp) );
 		
 		hsdef.pos_and_orient.x = vect_input[5*i-2];
@@ -163,6 +163,7 @@ void CnewSliderPG::produceTraj(trajFeatures & t, const vector<float> & vect_inpu
 		
 		if(hsdef.support_foot == LEFT) hsdef.support_foot = RIGHT; else hsdef.support_foot = LEFT;
 	}
+
 	
 }
 

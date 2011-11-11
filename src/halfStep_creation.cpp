@@ -158,12 +158,22 @@ double y_adjust(float K, float r, float val, float T, float position) {
     
     double MIN_SPEED, MAX_SPEED;
     if( val > position ) {
-	MAX_SPEED = 1.0; //it is inconceivable to start at more than 1m/s
-	MIN_SPEED = 0.0;
+	MAX_SPEED = 1.0;
+	if( y(K, r, val, T, position, MAX_SPEED, T) < val ) { cout << "WARNING, INITIAL SPEED TOO FAST!" << endl; MAX_SPEED = 2.0; }
+	while( y(K, r, val, T, position, MAX_SPEED, T) < val ) MAX_SPEED += 1.0;
+	MIN_SPEED = -1.0;
+	if( y(K, r, val, T, position, MIN_SPEED, T) > val ) { cout << "WARNING, INITIAL SPEED TOO FAST!" << endl; MAX_SPEED = -2.0; }
+	while( y(K, r, val, T, position, MIN_SPEED, T) > val ) MIN_SPEED -= 1.0;
+// 	cout << position << " " << val << " " << y(K, r, val, T, position, MIN_SPEED, T) << " " << y(K, r, val, T, position, MAX_SPEED, T) << endl;
     }
     else {
-	MAX_SPEED = 0.0;
+	MAX_SPEED = 1.0;
+	if( y(K, r, val, T, position, MAX_SPEED, T) < val ) { cout << "WARNING, INITIAL SPEED TOO FAST!" << endl; MAX_SPEED = 2.0; }
+	while( y(K, r, val, T, position, MAX_SPEED, T) < val ) MAX_SPEED += 1.0;
 	MIN_SPEED = -1.0;
+	if( y(K, r, val, T, position, MIN_SPEED, T) > val ) { cout << "WARNING, INITIAL SPEED TOO FAST!" << endl; MAX_SPEED = -2.0; }
+	while( y(K, r, val, T, position, MIN_SPEED, T) > val ) MIN_SPEED -= 1.0;
+// 	cout << position << " " << val << " " << y(K, r, val, T, position, MIN_SPEED, T) << " " << y(K, r, val, T, position, MAX_SPEED, T) << endl;
     }
     
     double CURRENT_SPEED = (MAX_SPEED + MIN_SPEED) / 2.0;
@@ -180,7 +190,6 @@ double y_adjust(float K, float r, float val, float T, float position) {
 	    result = y(K, r, val, T, position, CURRENT_SPEED, T);
 	}
     }
-    
     return CURRENT_SPEED;   
 }
 
@@ -282,6 +291,7 @@ void construction_zmp_com_DOWNWARD(bool trueX_falseY, trajFeatures & t, const SE
     //Since it's a downward half-step, the start value is at the center of the support foot, and the end_value is at the barycenter of the feet.
     
     SE2 tmpconfig;
+
     composeSE2(tmpconfig, supportconfig, def.pos_and_orient);
     
     float start_value, end_value;
@@ -308,13 +318,11 @@ void construction_zmp_com_DOWNWARD(bool trueX_falseY, trajFeatures & t, const SE
     }
     else position = MIN(partialradius, 0.3*val);
     
-    
     //now we compute the intermediate speed, i.e. the speed of the com at tref = def.constants.t_start 
     //(notice that here we are doing all the calculations just like for an upward half-step; later we will reverse everything)
     double speed = y_adjust(K, r, val, T, position);
     //we also compute the initial speed: 
     double speedinit = findspeedinit( K, position, def.constants.t_start);
-    
     //Now with yinit and y we have our com trajectories.
     //Since it's a downward half-step, the zmp must shift as late as possible so we use (CASE 2) (see the function y).
 

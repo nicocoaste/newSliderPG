@@ -71,6 +71,11 @@ class slidingClass {
 	*/
 	~slidingClass();
 	
+	/*!
+	 * Redefined by the user; this function is used to implement the collision checks: 
+	 * it decides whether a configuration (defined by an instantFeatures) is valid or not.
+	 * This function is called by check_slideDownUp() and check_slideUpDown().
+	 */
 	virtual bool isValid(instantFeatures & i) { return true; }
 	
 	/*!
@@ -105,10 +110,10 @@ class slidingClass {
 	 * Similar to slideDownUpMAX, but slide using the negative time neg_time (in s.), so validity checks are NOT done. 
 	 */
 	int slideDownUpCOEF(trajFeatures & t, float neg_time, const trajFeatures & upward_halfstep);
-	/*!
-	 * The object used to check the validity of configurations. It might for 
-	 * example include self-collision checks.
-	 */
+// 	/*!
+// 	 * The object used to check the validity of configurations. It might for 
+// 	 * example include self-collision checks.
+// 	 */
 // 	CheckValidity validator;
 	
     private:

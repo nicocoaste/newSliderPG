@@ -125,7 +125,7 @@ class CnewSliderPG
 		 *           but the following parameters are all RELATIVE
 		 *           coordinates ! What follows is a list of groups of
 		 *           parameters, each group corresponding to sequences of half-steps. 
-		 *           Each group has 5 parameters. and corresponds to 2
+		 *           Each group has 5 parameters, and corresponds to 2
 		 *           half-steps: one up, and one down. \n
 		 *           The two first parameters are the "sliding negative times" 
 		 *           (in s.), for respectively the first and second half-step.

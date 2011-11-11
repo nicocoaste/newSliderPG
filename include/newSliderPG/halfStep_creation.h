@@ -54,7 +54,7 @@ class SE2 {
 	float y;
 	float theta;   //in radians
     private:
-	friend float dist(SE2 &c1, SE2 & c2);	
+	friend float dist(SE2 &c1, SE2 & c2);
 };
 
 /*!
